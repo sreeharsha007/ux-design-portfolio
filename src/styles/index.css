@@ -1,0 +1,25 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+@import './light-overrides.css';
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar */
+body::-webkit-scrollbar { width: 8px; }
+body::-webkit-scrollbar-track { background: var(--surface); }
+body::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #2563eb, #06b6d4); border-radius: 10px; }
+body::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #3b82f6, #22d3ee); }
+body { scrollbar-width: thin; scrollbar-color: #2563eb var(--surface); -ms-overflow-style: none; background: var(--surface); }
+
+::selection { background: rgba(37, 99, 235, 0.3); color: #fff; }
+.dark ::selection { background: rgba(37, 99, 235, 0.3); color: #fff; }
+:not(.dark) ::selection { background: rgba(37, 99, 235, 0.15); color: #000; }
+
+/* Smooth transitions for all interactive elements */
+a, button {
+  transition: all 0.3s ease;
+}
