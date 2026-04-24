@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(dir \"C:\\\\Users\\\\Harsha\\\\Projects\\\\UX Design Portfolio Website\\\\_memory\" /s /b)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx tsc *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(node_modules\\\\.bin\\\\tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "WebFetch(domain:linear.app)",
+      "WebFetch(domain:vercel.com)",
+      "WebFetch(domain:stripe.com)",
+      "Bash(python3 -c \" import sys, json for line in sys.stdin: try: d = json.loads\\(line\\) msg = d.get\\('message', {}\\) role = msg.get\\('role', ''\\) content = msg.get\\('content', []\\) if isinstance\\(content, list\\): for c in content: if isinstance\\(c, dict\\) and c.get\\('type'\\) == 'text': txt = c.get\\('text', ''\\) if len\\(txt\\) > 20: print\\(f'[{role}] {txt[:200]}'\\) print\\('---'\\) except: pass \")",
+      "Bash(pnpm exec *)",
+      "Bash(node_modules/.bin/vite build *)",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__computer",
+      "mcp__Claude_in_Chrome__javascript_tool",
+      "WebSearch",
+      "WebFetch(domain:unsplash.com)",
+      "WebFetch(domain:www.pexels.com)",
+      "PowerShell([System.Environment]::GetEnvironmentVariable\\(\"CLAUDE_CODE_MAX_OUTPUT_TOKENS\", \"User\"\\))",
+      "Bash(git -C \"C:\\\\Users\\\\Harsha\\\\Projects\\\\UX Design Portfolio Website\" branch -a)",
+      "Bash(git -C \"C:\\\\Users\\\\Harsha\\\\Projects\\\\UX Design Portfolio Website\" checkout feature/iceberg-redesign)"
+    ]
+  }
+}

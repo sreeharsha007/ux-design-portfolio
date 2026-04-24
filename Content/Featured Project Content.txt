@@ -1,0 +1,62 @@
+AI-Native Security Intelligence Platform
+Finding vulnerabilities was possible. Understanding them in context was not.
+I worked on an AI-native security platform designed to help teams identify vulnerabilities across different layers of product development by connecting code, organizational structure, and functional ownership into a more actionable workflow.
+At the time, the market had tools that could surface signals, but not many that could connect those signals to ownership, accountability, business impact, and cross-functional action in a way that reflected the context of a specific organization.
+
+Context
+The problem was rooted in how modern organizations operate.
+Resources were shared across teams and functions. Ownership was often distributed. Costs, accountability, and vulnerabilities were difficult to trace at a granular level. As structures became more layered, it became harder to understand what mattered, who needed to act, and how issues should be prioritized.
+Accessing information added another layer of friction. Users often had to move through deep architectural and hierarchical drill-downs just to find the insight they needed.
+Root cause analysis was equally fragmented. In practice, RCA is collaborative and cross-functional, but the workflows supporting it did not reflect how teams actually investigate and resolve issues together.
+
+Challenge
+The problem was not finding security signals. It was understanding them in context.
+Three things made that difficult:
+* Risk context was fragmented. Technical findings were visible, but their relationship to ownership, organizational structure, and impact was hard to trace. 
+* Accessing insights required too much effort. Critical information was buried inside deep hierarchies, slowing down high-stakes workflows. 
+* RCA was collaborative, but the workflow was not. Investigations involved multiple teams, yet the supporting experience was disjointed. 
+At the same time, AI introduced a new opportunity to surface intelligence more naturally, but the interaction patterns were still evolving. That made trust, clarity, and feedback essential.
+
+What I Led
+I contributed across product definition, workflow design, delivery readiness, and system scalability.
+My work included:
+* Defining the MVP through client workshops, alignment sessions, and prioritization exercises that helped shape a funding-ready scope 
+* Shaping the product direction through market analysis, AI trend mapping, and security landscape research 
+* Defining key journeys through workflow mapping, journey breakdowns, and collaborative RCA flow design 
+* Improving UI delivery readiness through implementation-aware handoff, structured specifications, and reusable interaction patterns 
+* Building a scalable design foundation through design system thinking, reusable components, and foundational patterns for future modules 
+
+Key Decisions
+Making organizational complexity more intelligible
+I introduced a semantic layer during onboarding and mapping to better structure organizational information for both users and AI. This created a stronger basis for linking vulnerabilities to ownership, accountability, cost visibility, and business context.
+Reducing dependence on drill-down navigation
+To reduce the effort needed to retrieve insights, the experience introduced both global and contextual AI chat. This gave users a faster way to access answers and updates without removing the ability to drill deeper when needed.
+Reframing RCA around collaboration
+A key gap emerged in how root cause analysis was being performed. Since RCA is typically cross-functional, I helped shape an AI-powered canvas that better supported investigation in context, team collaboration, and shareable outputs for quicker resolution.
+Grounding AI interactions in usability principles
+Because AI UI patterns were still maturing, I used HCI principles to shape interactions that felt more understandable, responsive, and trustworthy in a high-stakes environment.
+
+What Changed
+The work helped turn an ambitious concept into a more structured and scalable MVP direction.
+* Organizational context became more usable. The semantic layer gave the system a better understanding of how teams, resources, ownership, and vulnerabilities related to one another. 
+* Insight access became faster. Global and contextual AI chat reduced the need to manually navigate deep hierarchies just to retrieve information. 
+* RCA became more aligned with real workflows. The canvas supported a more collaborative investigation model and made it easier to turn analysis into shareable outputs. 
+* Delivery became more scalable. A stronger design system and cleaner UI handoff reduced friction between design and implementation. 
+* The MVP became clearer. Product framing, workflow definition, and prioritization helped shape a more credible direction for funding and future growth. 
+
+Designing for AI
+One of the most important parts of this project was designing in a space where AI interaction patterns were still taking shape.
+Rather than treating AI as a layer on top of the interface, I approached it as part of the workflow itself. That required careful thinking around trust, system feedback, usability, and user control.
+This project reinforced that in AI-led experiences, capability alone is not enough. Users also need clarity, orientation, and confidence in how the system is helping them.
+
+Next
+The next phase focused on deepening the investigation workflow.
+Planned enhancements included:
+* richer canvas capabilities 
+* stronger RCA-to-deployment flows 
+* continued refinement of AI-led interaction patterns as the product matured 
+
+Reflection
+This project reinforced how important it is to design AI experiences around clarity, feedback, and control, especially in complex and high-stakes environments.
+It also highlighted a broader learning: when designing emerging AI products, the challenge is not only shaping the intelligence itself, but shaping the interaction patterns that help people trust and use that intelligence effectively.
+
