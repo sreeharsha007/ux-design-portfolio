@@ -1,30 +1,194 @@
-import React, { useState } from "react";
-import { useTheme } from "../context/ThemeContext";
-import { motion, AnimatePresence } from "motion/react";
+import React, { useState, useEffect, useRef, useId } from "react";
 import { Link } from "react-router";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue, useMotionValueEvent, useInView } from "motion/react";
 import {
-  ArrowRight,
-  Sparkles,
-  Zap,
-  TrendingUp,
-  Star,
-  ChevronRight,
+  ArrowRight, TrendingUp, Star, ChevronRight,
+  Shield, BarChart2, Smartphone, Layers,
+  MessageSquare, Video, FileText,
 } from "lucide-react";
 import { projects } from "../data/projects";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
 import WhoItsFor from "./WhoItsFor";
+import IcebergSection from "./IcebergSection";
+import CaseStudyModal from "./CaseStudyModal";
+import HighlightMark from "./HighlightMark";
 
-// ─── AI Stack Data ────────────────────────────────────────────────────────────
+// ─── Noise Displacement Shimmer ──────────────────────────────────────────────
+
+function NoiseShimmer() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const W = 100, H = 75;
+    canvas.width = W;
+    canvas.height = H;
+
+    let t = 0;
+    let raf: number;
+
+    const sample = (x: number, y: number, time: number) => {
+      const n1 = Math.sin(x * 1.1 + time * 0.55) * Math.cos(y * 0.85 + time * 0.38) * 0.42;
+      const n2 = Math.sin(x * 2.1 + y * 1.8 + time * 0.40) * 0.32;
+      const n3 = Math.cos(x * 0.65 + y * 1.6 + time * 0.26) * 0.26;
+      return n1 + n2 + n3;
+    };
+
+    const draw = () => {
+      const img = ctx.createImageData(W, H);
+      const d = img.data;
+      for (let x = 0; x < W; x++) {
+        for (let y = 0; y < H; y++) {
+          const v = (sample(x / W * 4, y / H * 4, t) + 1) / 2;
+          const a = Math.max(0, Math.floor(Math.pow(v, 1.2) * 95));
+          const i = (y * W + x) * 4;
+          d[i] = 196; d[i + 1] = 82; d[i + 2] = 42; d[i + 3] = a;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      t += 0.006;
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 pointer-events-none"
+      style={{ width: "100%", height: "100%", filter: "blur(44px)", opacity: 1 }}
+    />
+  );
+}
+
+// ─── World Map ────────────────────────────────────────────────────────────────
+
+const MAP_MARKERS = [
+  { x: 128, y: 122, label: "San Francisco, CA" },
+  { x: 401, y: 104, label: "London, UK" },
+  { x: 572, y: 148, label: "Bangalore, India" },
+];
+
+function WorldMap({ activeIndex }: { activeIndex: number }) {
+  return (
+    <div className="relative w-full overflow-hidden rounded-2xl" style={{ background: "#f0eeeb", aspectRatio: "800/300" }}>
+      <svg
+        viewBox="0 0 800 300"
+        xmlns="http://www.w3.org/2000/svg"
+        className="absolute inset-0 w-full h-full"
+        aria-hidden="true"
+      >
+        {/* Latitude / longitude grid */}
+        {[0,1,2,3,4,5,6].map(i => (
+          <line key={`h${i}`} x1="0" y1={i*50} x2="800" y2={i*50} stroke="#e2ded9" strokeWidth="0.5" />
+        ))}
+        {[0,1,2,3,4,5,6,7,8,9,10,11,12].map(i => (
+          <line key={`v${i}`} x1={i*800/12} y1="0" x2={i*800/12} y2="300" stroke="#e2ded9" strokeWidth="0.5" />
+        ))}
+
+        {/* Continents */}
+        <g fill="rgba(196,82,42,0.11)" stroke="rgba(196,82,42,0.22)" strokeWidth="0.75" strokeLinejoin="round">
+          {/* North America */}
+          <polygon points="80,75 188,62 258,102 258,142 222,192 178,202 132,158 96,152 76,118" />
+          {/* South America */}
+          <polygon points="218,198 262,180 312,202 302,262 270,288 250,282 238,258 222,232" />
+          {/* Europe */}
+          <polygon points="362,108 394,85 444,75 478,98 482,128 468,148 438,146 392,138 370,133" />
+          {/* Africa */}
+          <polygon points="368,145 435,126 500,145 508,195 498,248 478,282 442,292 408,282 372,248 358,196" />
+          {/* Asia (main body) */}
+          <polygon points="478,92 548,45 638,38 722,48 752,75 748,108 718,145 672,158 620,162 578,162 542,152 512,138 492,112" />
+          {/* Indian subcontinent */}
+          <polygon points="512,148 568,145 588,162 582,205 560,224 532,220 514,192 512,162" />
+          {/* Japan */}
+          <polygon points="726,102 738,92 752,96 750,118 738,124 726,118" />
+          {/* SE Asia */}
+          <polygon points="618,162 652,155 668,172 658,195 638,198 618,182" />
+          {/* Australia */}
+          <polygon points="650,215 702,205 744,218 750,248 734,272 700,278 658,265 642,242" />
+          {/* Greenland */}
+          <polygon points="290,38 334,30 350,48 338,64 310,68 288,56" />
+          {/* UK / Ireland */}
+          <polygon points="374,98 385,88 394,92 392,108 380,114 372,108" />
+        </g>
+
+        {/* Connection arcs between markers */}
+        {MAP_MARKERS.map((m, i) => {
+          const next = MAP_MARKERS[(i + 1) % MAP_MARKERS.length];
+          const mx = (m.x + next.x) / 2;
+          const my = Math.min(m.y, next.y) - 30;
+          return (
+            <path
+              key={i}
+              d={`M ${m.x} ${m.y} Q ${mx} ${my} ${next.x} ${next.y}`}
+              fill="none"
+              stroke={i === activeIndex ? "rgba(196,82,42,0.28)" : "rgba(196,82,42,0.08)"}
+              strokeWidth={i === activeIndex ? 1.5 : 0.75}
+              strokeDasharray="4 3"
+            />
+          );
+        })}
+      </svg>
+
+      {/* Markers */}
+      {MAP_MARKERS.map((marker, i) => {
+        const isActive = i === activeIndex;
+        return (
+          <div
+            key={i}
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            style={{ left: `${(marker.x / 800) * 100}%`, top: `${(marker.y / 300) * 100}%` }}
+          >
+            {isActive && (
+              <motion.div
+                className="absolute rounded-full"
+                animate={{ scale: [1, 2.8, 1], opacity: [0.35, 0, 0.35] }}
+                transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
+                style={{ inset: -7, background: "rgba(196,82,42,0.28)" }}
+              />
+            )}
+            <div
+              className="relative rounded-full border-2 border-white transition-all duration-400"
+              style={{
+                width: isActive ? 14 : 10,
+                height: isActive ? 14 : 10,
+                background: isActive ? "var(--terra-500)" : "rgba(196,82,42,0.38)",
+                boxShadow: isActive ? "0 0 0 3px rgba(196,82,42,0.18), 0 2px 10px rgba(196,82,42,0.35)" : "none",
+              }}
+            />
+            {isActive && (
+              <motion.div
+                initial={{ opacity: 0, y: 4, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap px-2.5 py-1 rounded-lg text-[12px] font-medium z-10"
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #e7e5e4",
+                  color: "#57534e",
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+                }}
+              >
+                {marker.label}
+              </motion.div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── AI Stack Data (legacy — replaced by IcebergSection) ─────────────────────
 
 const AI_STACK = [
   {
-    number: "01",
     phase: "Discover",
-    tools: [
-      { name: "Claude", color: "blue" },
-      { name: "Otter.ai", color: "blue" },
-      { name: "Maze", color: "blue" },
-    ],
+    tools: [{ name: "Claude" }, { name: "Otter.ai" }, { name: "Maze" }],
     agents: [
       { name: "Research Synthesizer", description: "Aggregates interviews, surveys & support tickets into themes" },
       { name: "Competitor Scanner", description: "Scans rival products, generates UX gap analysis" },
@@ -36,16 +200,10 @@ const AI_STACK = [
     output: "Research synthesis",
     timeBefore: "2–4 weeks",
     timeAfter: "3–5 days",
-    phaseColor: "from-blue-600 to-indigo-600",
   },
   {
-    number: "02",
     phase: "Synthesise",
-    tools: [
-      { name: "Dovetail AI", color: "indigo" },
-      { name: "GPT-4", color: "indigo" },
-      { name: "Miro AI", color: "indigo" },
-    ],
+    tools: [{ name: "Dovetail AI" }, { name: "GPT-4" }, { name: "Miro AI" }],
     agents: [
       { name: "Insight Clustering", description: "Groups qualitative data into actionable themes" },
       { name: "Brief Generator", description: "Turns findings into structured design briefs" },
@@ -57,16 +215,10 @@ const AI_STACK = [
     output: "Insights + brief",
     timeBefore: "1–2 weeks",
     timeAfter: "4–8 hours",
-    phaseColor: "from-indigo-600 to-violet-600",
   },
   {
-    number: "03",
     phase: "Ideate",
-    tools: [
-      { name: "Midjourney", color: "violet" },
-      { name: "GPT-4", color: "violet" },
-      { name: "Framer AI", color: "violet" },
-    ],
+    tools: [{ name: "Midjourney" }, { name: "GPT-4" }, { name: "Framer AI" }],
     agents: [
       { name: "Concept Explorer", description: "Generates diverse design directions from constraints" },
       { name: "Moodboard Curator", description: "Sources visual references aligned to brand" },
@@ -78,16 +230,10 @@ const AI_STACK = [
     output: "Concepts + direction",
     timeBefore: "1–2 weeks",
     timeAfter: "1–2 days",
-    phaseColor: "from-violet-600 to-purple-600",
   },
   {
-    number: "04",
     phase: "Design",
-    tools: [
-      { name: "Figma AI", color: "cyan" },
-      { name: "v0", color: "cyan" },
-      { name: "Framer", color: "cyan" },
-    ],
+    tools: [{ name: "Figma AI" }, { name: "v0" }, { name: "Framer" }],
     agents: [
       { name: "Component Generator", description: "Creates Figma components from natural language" },
       { name: "A11y Checker", description: "Real-time WCAG accessibility validation" },
@@ -99,16 +245,10 @@ const AI_STACK = [
     output: "Hi-fi prototype",
     timeBefore: "3–6 weeks",
     timeAfter: "2–4 weeks",
-    phaseColor: "from-cyan-600 to-blue-600",
   },
   {
-    number: "05",
     phase: "Deliver",
-    tools: [
-      { name: "Claude", color: "emerald" },
-      { name: "Notion AI", color: "emerald" },
-      { name: "Figma", color: "emerald" },
-    ],
+    tools: [{ name: "Claude" }, { name: "Notion AI" }, { name: "Figma" }],
     agents: [
       { name: "Spec Writer", description: "Generates dev handoff docs with implementation notes" },
       { name: "QA Annotator", description: "Auto-annotates edge cases and interaction states" },
@@ -120,62 +260,70 @@ const AI_STACK = [
     output: "Dev-ready specs",
     timeBefore: "1–2 weeks",
     timeAfter: "2–3 days",
-    phaseColor: "from-emerald-600 to-green-600",
   },
 ];
 
-const TOOL_COLORS: Record<string, string> = {
-  blue: "bg-blue-500/10 border-blue-500/20 text-blue-200/80",
-  indigo: "bg-indigo-500/10 border-indigo-500/20 text-indigo-200/80",
-  violet: "bg-violet-500/10 border-violet-500/20 text-violet-200/80",
-  cyan: "bg-cyan-500/10 border-cyan-500/20 text-cyan-200/80",
-  emerald: "bg-emerald-500/10 border-emerald-500/20 text-emerald-200/80",
-};
-
-// Per-layer colors: top face (lightest), left-front face (darkest), right-front face (medium)
 const LAYER_GRADIENTS = [
-  { top: "rgba(59,130,246,0.45)",  front: "rgba(30,64,175,0.90)",   side: "rgba(37,99,235,0.65)",   border: "rgba(96,165,250,0.30)",  accent: "from-blue-500 to-indigo-500"   },
-  { top: "rgba(99,102,241,0.45)", front: "rgba(67,56,202,0.90)",   side: "rgba(79,70,229,0.65)",   border: "rgba(129,140,248,0.30)", accent: "from-indigo-500 to-violet-500" },
-  { top: "rgba(139,92,246,0.45)", front: "rgba(109,40,217,0.90)",  side: "rgba(124,58,237,0.65)",  border: "rgba(167,139,250,0.30)", accent: "from-violet-500 to-purple-500" },
-  { top: "rgba(6,182,212,0.45)",  front: "rgba(14,116,144,0.90)",  side: "rgba(8,145,178,0.65)",   border: "rgba(34,211,238,0.30)",  accent: "from-cyan-500 to-blue-500"     },
-  { top: "rgba(16,185,129,0.45)", front: "rgba(4,120,87,0.90)",    side: "rgba(5,150,105,0.65)",   border: "rgba(52,211,153,0.30)",  accent: "from-emerald-500 to-green-500" },
+  { top: "rgba(196,82,42,0.40)", front: "rgba(28,25,23,0.97)", side: "rgba(196,82,42,0.58)", border: "rgba(196,82,42,0.32)" },
+  { top: "rgba(168,70,36,0.34)", front: "rgba(41,37,36,0.94)", side: "rgba(168,70,36,0.50)", border: "rgba(168,70,36,0.26)" },
+  { top: "rgba(120,53,15,0.30)", front: "rgba(55,52,48,0.92)", side: "rgba(120,53,15,0.44)", border: "rgba(120,53,15,0.22)" },
+  { top: "rgba(87,83,78,0.28)", front: "rgba(68,64,60,0.90)", side: "rgba(87,83,78,0.40)", border: "rgba(87,83,78,0.18)" },
+  { top: "rgba(68,65,60,0.24)", front: "rgba(78,74,70,0.88)", side: "rgba(68,65,60,0.36)", border: "rgba(68,65,60,0.15)" },
 ];
-
-// ─── Testimonials ─────────────────────────────────────────────────────────────
 
 const TESTIMONIALS = [
   {
-    quote:
-      "Delivered a full design system in 8 weeks that our previous agency quoted 6 months for. The quality was exceptional and the handoff was the cleanest we've ever received.",
+    quote: "Delivered a full design system in 8 weeks that our previous agency quoted 6 months for. The quality was exceptional and the handoff was the cleanest we've ever received.",
     name: "Sarah Kim",
     role: "VP of Product",
     company: "Series B SaaS",
+    location: "San Francisco, CA",
     rating: 5,
   },
   {
-    quote:
-      "What stood out was the speed without sacrificing depth. We had a usability-tested, dev-ready prototype for our investor demo in 3 weeks. Highly recommend.",
+    quote: "What stood out was the speed without sacrificing depth. We had a usability-tested, dev-ready prototype for our investor demo in 3 weeks. Highly recommend.",
     name: "Marcus Osei",
     role: "Co-founder & CEO",
     company: "FinTech Startup",
+    location: "London, UK",
     rating: 5,
   },
   {
-    quote:
-      "Finally a designer who understands enterprise constraints. The AI workflow breakdowns in every deliverable helped our team understand the decisions — not just the output.",
+    quote: "Finally a designer who understands enterprise constraints. The AI workflow breakdowns in every deliverable helped our team understand the decisions — not just the output.",
     name: "Priya Nair",
     role: "Director of UX",
     company: "Enterprise Healthcare",
+    location: "Bangalore, India",
     rating: 5,
   },
 ];
 
-// ─── AI Stack: Left-Right Interactive Layout ────────────────────────────────
+const PROJECT_DOMAIN_ICONS = [Shield, BarChart2, Smartphone, Layers];
+
+// ─── Animated Counter ─────────────────────────────────────────────────────────
+
+function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const mv = useMotionValue(0);
+  const spring = useSpring(mv, { stiffness: 60, damping: 18 });
+  const inView = useInView(ref, { once: true, margin: "-5% 0px" });
+  const [display, setDisplay] = useState("0");
+
+  useEffect(() => {
+    if (inView) mv.set(value);
+  }, [inView, mv, value]);
+
+  useMotionValueEvent(spring, "change", (v) => {
+    setDisplay(Math.round(v).toString());
+  });
+
+  return <span ref={ref}>{display}{suffix}</span>;
+}
+
+// ─── AI Stack: Interactive Layout ────────────────────────────────────────────
 
 function StackWithDetail() {
   const [active, setActive] = useState(0);
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
   const accordionRef = React.useRef<HTMLDivElement>(null);
   const [accordionH, setAccordionH] = React.useState(0);
 
@@ -186,10 +334,7 @@ function StackWithDetail() {
     return () => ro.disconnect();
   }, []);
 
-  const W = 260;
-  const HH = 62;
-  const DEPTH = 28;
-  // Calculate overlap so the stack fills exactly the accordion height
+  const W = 260, HH = 62, DEPTH = 28;
   const diamondH = HH * 2 + DEPTH;
   const count = AI_STACK.length;
   const overlap = accordionH > 0
@@ -197,21 +342,19 @@ function StackWithDetail() {
     : 50;
 
   return (
-    <div className="hidden lg:flex justify-center items-start gap-28">
-      {/* Left: Diamond stack — height matches accordion */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="flex flex-col items-center flex-shrink-0"
-      >
+    <div className="hidden lg:flex justify-center items-start gap-24">
+      {/* Diamond stack */}
+      <div className="flex flex-col items-center flex-shrink-0">
         {AI_STACK.map((s, i) => {
           const l = LAYER_GRADIENTS[i];
           const isActive = i === active;
           return (
-            <button
+            <motion.button
               key={s.phase}
+              initial={{ opacity: 0, y: -16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
               onClick={() => setActive(i)}
               className="relative cursor-pointer flex flex-col items-center"
               style={{
@@ -221,8 +364,8 @@ function StackWithDetail() {
                 transition: "transform 0.4s cubic-bezier(.4,0,.2,1), filter 0.4s cubic-bezier(.4,0,.2,1)",
                 transform: isActive ? "scale(1.08) translateY(-2px)" : "scale(1)",
                 filter: isActive
-                  ? `brightness(${isDark ? 1.35 : 1.1}) drop-shadow(0 4px 18px ${l.border})`
-                  : `brightness(${isDark ? 0.65 : 0.85}) saturate(${isDark ? 0.5 : 0.4}) opacity(0.7)`,
+                  ? `brightness(1.08) drop-shadow(0 6px 22px ${l.border})`
+                  : `brightness(0.68) saturate(0.25) opacity(0.52)`,
               }}
             >
               <div className="relative" style={{ width: W, height: diamondH }}>
@@ -233,29 +376,28 @@ function StackWithDetail() {
                   className="absolute left-1/2 -translate-x-1/2 pointer-events-none font-medium tracking-wide whitespace-nowrap"
                   style={{
                     top: HH - 7,
-                    fontSize: 11,
-                    color: isActive
-                      ? (isDark ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.85)")
-                      : (isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.45)"),
+                    fontSize: 12,
+                    fontFamily: "var(--font-sans)",
+                    color: isActive ? "rgba(255,255,255,0.90)" : "rgba(255,255,255,0.38)",
                     transition: "color 0.4s ease",
                   }}
                 >
                   {s.phase}
                 </span>
               </div>
-            </button>
+            </motion.button>
           );
         })}
-      </motion.div>
+      </div>
 
-      {/* Right: Accordion panel */}
+      {/* Accordion panel */}
       <div
         ref={accordionRef}
-        className="w-[400px] flex-shrink-0 rounded-xl transition-colors duration-300"
+        className="w-[420px] flex-shrink-0 rounded-2xl overflow-hidden"
         style={{
-          background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-          border: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.12)",
-          boxShadow: isDark ? "none" : "0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.03)",
+          background: "#ffffff",
+          border: "1px solid #e7e5e4",
+          boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
         }}
       >
         {AI_STACK.map((s, i) => {
@@ -264,42 +406,48 @@ function StackWithDetail() {
           return (
             <div
               key={s.phase}
-              style={{ borderBottom: i < count - 1 ? `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}` : "none" }}
+              style={{ borderBottom: i < count - 1 ? "1px solid #e7e5e4" : "none" }}
             >
               {/* Header */}
               <button
                 onClick={() => setActive(i)}
-                className="w-full flex items-center justify-between px-5 py-3 text-left transition-colors duration-200"
-                style={{ background: isOpen ? (isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)") : "transparent" }}
+                className="w-full flex items-center justify-between px-5 py-4 text-left transition-colors duration-200"
+                style={{ background: isOpen ? "#f5f5f4" : "transparent" }}
               >
                 <div className="flex items-center gap-3">
+                  <div
+                    className="w-2 h-2 rounded-full flex-shrink-0 transition-all duration-300"
+                    style={{ background: isOpen ? "var(--terra-500)" : "#a8a29e" }}
+                  />
                   <span
-                    className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold transition-all duration-300"
+                    className="text-[13px] font-semibold transition-colors duration-300"
                     style={{
-                      background: isOpen ? `linear-gradient(135deg, ${l.front}, ${l.side})` : (isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"),
-                      color: isOpen ? "white" : (isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)"),
+                      fontFamily: "var(--font-display)",
+                      color: isOpen ? "#1c1917" : "#78716c",
                     }}
-                  >
-                    {s.number}
-                  </span>
-                  <span
-                    className="text-sm font-medium transition-colors duration-300"
-                    style={{ color: isOpen ? (isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.85)") : (isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.45)") }}
                   >
                     {s.phase}
                   </span>
+                  {isOpen && (
+                    <span
+                      className="text-[12px] uppercase tracking-widest px-2 py-0.5 rounded"
+                      style={{ background: "var(--terra-light)", color: "var(--terra-500)" }}
+                    >
+                      {s.output}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   {!isOpen && (
-                    <span className="text-[11px] text-white/25">
-                      {s.agents.length} agents · {s.tools.length} tools
+                    <span className="text-[12px] text-stone-500">
+                      {s.timeAfter}
                     </span>
                   )}
                   <ChevronRight
                     className="w-3.5 h-3.5 transition-transform duration-300"
                     style={{
                       transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-                      color: isOpen ? (isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)") : (isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)"),
+                      color: "#78716c",
                     }}
                   />
                 </div>
@@ -315,22 +463,49 @@ function StackWithDetail() {
                     transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="px-5 pb-5 pt-2 space-y-4">
-                      {/* Time */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-white/25 line-through">{s.timeBefore}</span>
-                        <ArrowRight className="w-3 h-3 text-white/15" />
-                        <span className="text-xs text-emerald-400 font-semibold">{s.timeAfter}</span>
+                    <div className="px-5 pb-6 pt-5 space-y-5">
+
+                      {/* Time saved — prominent */}
+                      <div
+                        className="flex items-center justify-between p-4 rounded-xl"
+                        style={{ background: "var(--terra-light)", border: "1px solid var(--terra-border)" }}
+                      >
+                        <div>
+                          <p className="text-[12px] uppercase tracking-widest mb-0.5" style={{ color: "var(--terra-600)" }}>
+                            Time saved
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm line-through text-stone-400">{s.timeBefore}</span>
+                            <ArrowRight className="w-3 h-3 text-stone-500" />
+                            <span className="text-base font-bold" style={{ color: "var(--terra-500)", fontFamily: "var(--font-display)" }}>
+                              {s.timeAfter}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
+                          style={{ background: "var(--terra-500)" }}
+                        >
+                          <span className="text-white text-xs font-bold">{String(i + 1).padStart(2, "0")}</span>
+                        </div>
                       </div>
 
                       {/* Agents */}
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-white/25 mb-2.5">Agents</p>
-                        <div className="space-y-2.5">
+                        <p className="text-[12px] uppercase tracking-widest mb-3" style={{ color: "#78716c" }}>
+                          AI Agents
+                        </p>
+                        <div className="space-y-3">
                           {s.agents.map((agent) => (
-                            <div key={agent.name}>
-                              <p className="text-[13px] text-white/80 font-medium">{agent.name}</p>
-                              <p className="text-[12px] text-white/35 leading-relaxed mt-0.5">{agent.description}</p>
+                            <div key={agent.name} className="flex gap-3">
+                              <div
+                                className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-[6px]"
+                                style={{ background: "var(--terra-500)" }}
+                              />
+                              <div>
+                                <p className="text-[14px] font-semibold text-stone-800">{agent.name}</p>
+                                <p className="text-[14px] leading-relaxed text-stone-500 mt-0.5">{agent.description}</p>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -338,28 +513,45 @@ function StackWithDetail() {
 
                       {/* Workflows */}
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-white/25 mb-2.5">Workflows</p>
+                        <p className="text-[12px] uppercase tracking-widest mb-3" style={{ color: "#78716c" }}>
+                          Automated Workflows
+                        </p>
                         <div className="space-y-2">
                           {s.workflows.map((wf) => (
                             <div key={wf} className="flex items-start gap-2.5">
-                              <span className="w-1 h-1 rounded-full bg-emerald-400/40 mt-[7px] flex-shrink-0" />
-                              <p className="text-[12px] text-white/40 leading-relaxed">{wf}</p>
+                              <span
+                                className="w-1 h-1 rounded-full mt-[6px] flex-shrink-0"
+                                style={{ background: "rgba(196,82,42,0.45)" }}
+                              />
+                              <p className="text-[14px] leading-relaxed text-stone-500">{wf}</p>
                             </div>
                           ))}
                         </div>
                       </div>
 
                       {/* Tools */}
-                      <div className="pt-3 border-t border-white/[0.06]">
-                        <p className="text-[10px] uppercase tracking-widest text-white/25 mb-2">Tools</p>
+                      <div className="pt-4" style={{ borderTop: "1px solid #e7e5e4" }}>
+                        <p className="text-[12px] uppercase tracking-widest mb-2.5" style={{ color: "#78716c" }}>
+                          Tools
+                        </p>
                         <div className="flex flex-wrap gap-1.5">
                           {s.tools.map((t) => (
-                            <span key={t.name} className={`px-2.5 py-0.5 border rounded-full text-[11px] ${TOOL_COLORS[t.color]}`}>
+                            <span
+                              key={t.name}
+                              className="px-2.5 py-1 rounded-full text-[12px] font-medium"
+                              style={{
+                                background: "var(--terra-light)",
+                                border: "1px solid var(--terra-border)",
+                                color: "var(--terra-600)",
+                                fontFamily: "var(--font-mono)",
+                              }}
+                            >
                               {t.name}
                             </span>
                           ))}
                         </div>
                       </div>
+
                     </div>
                   </motion.div>
                 )}
@@ -372,504 +564,621 @@ function StackWithDetail() {
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Tilt Card ───────────────────────────────────────────────────────────────
+
+function TiltCard({
+  children, className, style, onMouseEnter, onMouseLeave,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  onMouseEnter?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onMouseLeave?: (e: React.MouseEvent<HTMLDivElement>) => void;
+}) {
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [3, -3]), { stiffness: 200, damping: 25 });
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-3, 3]), { stiffness: 200, damping: 25 });
+
+  return (
+    <motion.div
+      className={className}
+      style={{ ...style, rotateX, rotateY, transformPerspective: 1000 }}
+      onMouseMove={e => {
+        const r = e.currentTarget.getBoundingClientRect();
+        mx.set((e.clientX - r.left) / r.width - 0.5);
+        my.set((e.clientY - r.top) / r.height - 0.5);
+      }}
+      onMouseLeave={e => { mx.set(0); my.set(0); onMouseLeave?.(e); }}
+      onMouseEnter={onMouseEnter}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ─── Homepage ─────────────────────────────────────────────────────────────────
 
 export default function Homepage() {
   const featuredProject = projects[0];
   const moreProjects = projects.slice(1);
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [pauseAutoRotate, setPauseAutoRotate] = useState(false);
+
+  // 3D tilt for featured card
+  const featMX = useMotionValue(0);
+  const featMY = useMotionValue(0);
+  const featRotateX = useSpring(useTransform(featMY, [-0.5, 0.5], [4, -4]), { stiffness: 200, damping: 25 });
+  const featRotateY = useSpring(useTransform(featMX, [-0.5, 0.5], [-4, 4]), { stiffness: 200, damping: 25 });
+  const activeProject = projects.find((p) => p.id === activeProjectId) ?? null;
+
+  useEffect(() => {
+    if (pauseAutoRotate) return;
+    const id = setInterval(() => {
+      setActiveTestimonial(prev => (prev + 1) % TESTIMONIALS.length);
+    }, 4500);
+    return () => clearInterval(id);
+  }, [pauseAutoRotate]);
 
   return (
-    <div className="pt-20 bg-surface text-on-surface overflow-hidden transition-colors duration-300">
+    <div style={{ background: "#ffffff", color: "#1c1917", overflowX: "clip" }}>
 
       {/* ── 1. Hero ───────────────────────────────────────────────────────────── */}
-      <section className="min-h-screen flex items-center relative">
-        {/* Animated background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#0a1628_0%,#000000_100%)]" />
-          <motion.div
-            animate={{ x: [0, 100, 0], y: [0, -100, 0], scale: [1, 1.2, 1] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-blue-600/30 via-indigo-600/20 to-transparent rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ x: [0, -100, 0], y: [0, 100, 0], scale: [1.2, 1, 1.2] }}
-            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-0 left-1/4 w-[700px] h-[700px] bg-gradient-to-tr from-cyan-600/30 via-blue-600/20 to-transparent rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ x: [0, -50, 0], y: [0, -50, 0], scale: [1, 1.1, 1] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-violet-600/20 via-purple-600/10 to-transparent rounded-full blur-3xl"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
+      <section className="min-h-screen flex items-center relative pt-[64px]" style={{ background: "#ffffff" }}>
+        {/* Noise shimmer background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <NoiseShimmer />
         </div>
 
-        <div className="max-w-7xl mx-auto w-full relative z-10 p-[48px]">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left: text content */}
-            <div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500/10 backdrop-blur-xl border border-blue-500/20 rounded-full mb-8"
-              >
-                <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full animate-pulse" />
-                <span className="text-sm text-blue-200 tracking-wide">AI-Powered UX Design</span>
-                <Sparkles className="w-4 h-4 text-blue-400" />
-              </motion.div>
+        <div className="max-w-[1200px] mx-auto w-full relative z-10 px-6 lg:px-10 py-28 text-center">
 
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="text-6xl md:text-7xl lg:text-[7.5rem] mb-8 tracking-tighter leading-[0.9]"
-              >
-                <span className="block">UX Design.</span>
-                <span className="block bg-gradient-to-r from-blue-200 via-cyan-200 to-indigo-200 bg-clip-text text-transparent">
-                  AI Speed.
-                </span>
-                <span className="block">Real Results.</span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-xl md:text-2xl text-white/60 mb-12 max-w-3xl leading-relaxed"
-              >
-                I help startups and growth-stage companies ship better products faster —
-                using AI-accelerated design workflows that cut delivery time without cutting quality.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                className="flex flex-col sm:flex-row gap-4"
-              >
-                <a
-                  href="#work"
-                  className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full hover:shadow-[0_0_40px_rgba(37,99,235,0.5)] transition-all duration-300 inline-flex items-center justify-center gap-2 relative overflow-hidden"
-                  style={{ color: "#ffffff" }}
-                >
-                  <span className="relative z-10">See My Work</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-                </a>
-                <a
-                  href="#how-i-work"
-                  className="px-8 py-4 bg-white/5 backdrop-blur-xl border border-blue-500/20 rounded-full hover:bg-blue-500/10 hover:border-blue-500/30 transition-all duration-300 inline-flex items-center justify-center gap-2"
-                >
-                  How I Work
-                </a>
-              </motion.div>
-            </div>
-
-            {/* Right: floating stat cards */}
-            <div className="hidden lg:flex flex-col gap-5 items-end">
-              {([
-                { value: "40%", label: "faster delivery vs. traditional UX process", Icon: Zap, iconColor: "text-blue-400", bg: "bg-blue-500/15", delay: 0.6, dur: 5 },
-                { value: "20+", label: "projects shipped across SaaS, FinTech & HealthTech", Icon: TrendingUp, iconColor: "text-emerald-400", bg: "bg-emerald-500/15", delay: 0.75, dur: 7 },
-                { value: "5.0★", label: "average client rating on Upwork", Icon: Star, iconColor: "text-yellow-400", bg: "bg-yellow-500/15", delay: 0.9, dur: 6 },
-              ] as const).map(({ value, label, Icon, iconColor, bg, delay, dur }, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, delay }}
-                  className={i === 1 ? "self-center" : i === 2 ? "self-end" : "self-start"}
-                >
-                  <motion.div
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{ duration: dur, repeat: Infinity, ease: "easeInOut" }}
-                    className="p-5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl min-w-[220px] hover:border-blue-500/25 transition-colors"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className={`w-8 h-8 ${bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        <Icon className={`w-4 h-4 ${iconColor}`} />
-                      </div>
-                      <span className="text-3xl font-light tracking-tighter text-white">{value}</span>
-                    </div>
-                    <p className="text-sm text-white/40 leading-snug pl-11">{label}</p>
-                  </motion.div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2"
-        >
-          <div className="w-6 h-10 border-2 border-blue-500/30 rounded-full flex justify-center pt-2">
-            <motion.div
-              animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-1.5 h-3 bg-gradient-to-b from-blue-500 to-cyan-400 rounded-full"
-            />
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ── 2. AI Workflow Stack ──────────────────────────────────────────────── */}
-      <section id="how-i-work" className="py-32 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-violet-950/15 to-transparent pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative">
-          {/* Centered headline + horizontal stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto mb-16 lg:mb-20"
+          {/* Overline */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[12px] tracking-[0.18em] uppercase mb-10 font-semibold"
+            style={{ color: "var(--terra-500)" }}
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-500/10 backdrop-blur-xl border border-violet-500/20 rounded-full mb-8">
-              <Zap className="w-4 h-4 text-violet-400" />
-              <span className="text-sm text-violet-200/80 tracking-wide">The AI Difference</span>
-            </div>
-            <h2 className="text-5xl md:text-6xl tracking-tighter leading-tight mb-6">
-              <span className="bg-gradient-to-r from-blue-200 via-violet-200 to-cyan-200 bg-clip-text text-transparent">
-                Every phase.
-              </span>
-              <br />
-              <span className="text-white">AI-accelerated.</span>
-            </h2>
-            <p className="text-lg text-white/50 leading-relaxed mb-12">
-              The same rigour as a full design team — at a fraction of the time and cost. AI is embedded in every step, not bolted on at the end.
-            </p>
-            <div className="flex justify-center gap-8 lg:gap-12">
-              {[
-                { value: "4×", label: "faster research synthesis", detail: "3–5 days vs. 2–4 weeks" },
-                { value: "3×", label: "more concepts per project", detail: "same budget, more directions explored" },
-                { value: "50%", label: "less handoff friction", detail: "annotated specs engineers actually use" },
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 + i * 0.1 }}
-                  className="text-center"
+            UX Design · Available for new projects
+          </motion.p>
+
+          {/* Hero headline — line-by-line clip entrance */}
+          <h1
+            className="tracking-tight leading-[1.0] mb-10"
+            style={{
+              fontSize: "clamp(3.2rem, 8.5vw, 7rem)",
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+            }}
+          >
+            {[
+              { text: "UX Design.", color: "#1c1917" },
+              { text: "AI Speed.", color: "var(--terra-500)" },
+              { text: "Real Results.", color: "#8c8680" },
+            ].map((line, i) => (
+              <span key={i} className="block overflow-hidden">
+                <motion.span
+                  className="block"
+                  initial={{ y: "105%" }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.75, delay: 0.28 + i * 0.13, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ color: line.color }}
                 >
-                  <div className="text-3xl font-light tracking-tighter bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-white/80 text-sm font-medium">{stat.label}</div>
-                  <div className="text-white/35 text-[11px] mt-0.5">{stat.detail}</div>
-                </motion.div>
-              ))}
-            </div>
+                  {line.text}
+                </motion.span>
+              </span>
+            ))}
+          </h1>
+
+          {/* Subheadline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
+            className="text-xl md:text-2xl mb-14 max-w-2xl mx-auto leading-relaxed"
+            style={{ color: "#78716c" }}
+          >
+            I help <HighlightMark delay={1.4}>startups</HighlightMark> and <HighlightMark delay={1.65}>growth</HighlightMark>-stage companies ship better products faster —
+            using AI-accelerated design workflows that cut delivery time without cutting quality.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.72, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-20"
+          >
+            <a
+              href="#work"
+              className="group px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-semibold text-white"
+              style={{ background: "var(--terra-500)" }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
+            >
+              See My Work
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </a>
+            <a
+              href="#how-i-work"
+              className="px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-medium"
+              style={{ border: "1px solid #e7e5e4", color: "#57534e" }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "#1c1917";
+                (e.currentTarget as HTMLElement).style.color = "#1c1917";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = "#e7e5e4";
+                (e.currentTarget as HTMLElement).style.color = "#57534e";
+              }}
+            >
+              How I Work
+            </a>
           </motion.div>
 
-          {/* Desktop: Left stack + Right detail panel */}
-          <StackWithDetail />
+          {/* Proof strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.85, duration: 0.6 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm"
+            style={{ color: "#78716c" }}
+          >
+            <span>9 years experience</span>
+            <span className="hidden sm:block" style={{ color: "#e7e5e4" }}>·</span>
+            <span>Startups to enterprise</span>
+            <span className="hidden sm:block" style={{ color: "#e7e5e4" }}>·</span>
+            <span>Available for new projects</span>
+          </motion.div>
+        </div>
+      </section>
 
-          {/* Mobile: stacked cards */}
-          <div className="lg:hidden space-y-4">
-            {AI_STACK.map((item, i) => {
-              const layer = LAYER_GRADIENTS[i];
-              return (
-                <motion.div
-                  key={item.phase}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="p-4 rounded-xl"
-                  style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${layer.border}` }}
+      {/* ── 2. Metrics Strip ─────────────────────────────────────────────────── */}
+      <section style={{ background: "#f5f5f4", borderTop: "1px solid #e7e5e4", borderBottom: "1px solid #e7e5e4" }}>
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-stone-200">
+            {[
+              { num: 4, suffix: "×", label: "faster research synthesis", sub: "3–5 days vs. 2–4 weeks" },
+              { num: 3, suffix: "×", label: "more concepts per budget", sub: "same dollar, more directions" },
+              { num: 50, suffix: "%", label: "less handoff friction", sub: "annotated specs that ship" },
+              { num: 9, suffix: " yrs", label: "product design experience", sub: "SaaS, fintech, enterprise" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className="px-8 py-12 text-center"
+              >
+                <div
+                  className="font-bold tracking-tight mb-2 leading-none"
+                  style={{
+                    fontSize: "clamp(2.2rem, 4vw, 3.2rem)",
+                    fontFamily: "var(--font-display)",
+                    color: "var(--terra-500)",
+                  }}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-1 h-8 rounded-full bg-gradient-to-b ${item.phaseColor} flex-shrink-0`} />
-                      <div>
-                        <div className="text-sm text-white/90 font-medium">{item.phase}</div>
-                        <div className="text-xs text-white/35 mt-0.5">{item.output}</div>
-                      </div>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className="text-[10px] text-white/25 line-through">{item.timeBefore}</div>
-                      <div className="text-xs text-emerald-400 font-medium">{item.timeAfter}</div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                      <div className="text-[9px] uppercase tracking-wider text-white/25 mb-1.5">Agents</div>
-                      {item.agents.map((a) => (
-                        <div key={a.name} className="mb-1.5 last:mb-0">
-                          <div className="text-[11px] text-white/70 font-medium">{a.name}</div>
-                          <div className="text-[10px] text-white/30 leading-snug">{a.description}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div>
-                      <div className="text-[9px] uppercase tracking-wider text-white/25 mb-1.5">Workflows</div>
-                      {item.workflows.map((wf) => (
-                        <div key={wf} className="flex gap-1.5 mb-1.5 last:mb-0">
-                          <span className="text-white/20 text-[10px] mt-px flex-shrink-0">-</span>
-                          <span className="text-[10px] text-white/40 leading-snug">{wf}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/5">
-                    {item.tools.map((t) => (
-                      <span key={t.name} className={`px-2 py-0.5 border rounded-full text-[10px] ${TOOL_COLORS[t.color]}`}>
-                        {t.name}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              );
-            })}
+                  <AnimatedCounter value={stat.num} suffix={stat.suffix} />
+                </div>
+                <div className="text-[13px] font-medium mb-1 text-stone-700">{stat.label}</div>
+                <div className="text-[12px] text-stone-500">{stat.sub}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── 4. Featured Case Study ────────────────────────────────────────────── */}
-      <section id="work" className="py-32 relative">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      {/* ── 3. Case Studies ──────────────────────────────────────────────────── */}
+      <section id="work" className="py-32 relative" style={{ background: "radial-gradient(ellipse at 80% -5%, rgba(196,82,42,0.055) 0%, transparent 52%), #ffffff" }}>
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 relative">
+
+          {/* Section header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
             className="mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-500/10 backdrop-blur-xl border border-blue-500/20 rounded-full mb-6">
-              <Sparkles className="w-4 h-4 text-blue-400" />
-              <span className="text-sm text-blue-200/80 tracking-wide">Featured Project</span>
-            </div>
-            <h2 className="text-5xl md:text-7xl tracking-tighter leading-tight">
-              <span className="bg-gradient-to-r from-blue-200 via-cyan-200 to-indigo-200 bg-clip-text text-transparent">
-                Work that ships.
-              </span>
+            <p
+              className="text-[12px] font-semibold tracking-[0.14em] uppercase mb-5"
+              style={{ color: "var(--terra-500)" }}
+            >
+              Selected Work
+            </p>
+            <h2
+              className="font-bold tracking-tight leading-tight"
+              style={{
+                fontSize: "clamp(2.4rem, 5.5vw, 4.5rem)",
+                fontFamily: "var(--font-display)",
+                color: "#1c1917",
+              }}
+            >
+              Problems solved.<br />
+              <span style={{ color: "#8c8680" }}>Numbers attached.</span>
             </h2>
           </motion.div>
 
-          {/* Featured card */}
+          {/* ── Featured card ── */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className={`relative rounded-3xl overflow-hidden border mb-6 transition-colors duration-300 ${isDark ? "border-blue-500/20" : "border-blue-500/15 shadow-lg shadow-blue-500/5"}`}
+            transition={{ duration: 0.6, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            className="relative rounded-2xl overflow-hidden mb-5"
+            style={{
+              background: "#ffffff",
+              border: "1px solid #e7e5e4",
+              boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
+              rotateX: featRotateX,
+              rotateY: featRotateY,
+              transformPerspective: 1200,
+            }}
+            onMouseMove={e => {
+              const r = e.currentTarget.getBoundingClientRect();
+              featMX.set((e.clientX - r.left) / r.width - 0.5);
+              featMY.set((e.clientY - r.top) / r.height - 0.5);
+            }}
+            onMouseLeave={() => { featMX.set(0); featMY.set(0); }}
           >
-            {/* Background image */}
-            <div className="absolute inset-0">
-              <ImageWithFallback
-                src={featuredProject.image}
-                alt={featuredProject.title}
-                className={`w-full h-full object-cover ${isDark ? "opacity-15" : "opacity-8"}`}
-              />
-              <div className={`absolute inset-0 ${isDark ? "bg-gradient-to-br from-black via-black/90 to-black/70" : "bg-gradient-to-br from-white via-white/95 to-blue-50/80"}`} />
+
+            {/* Image area — gradient top, image blends in from below */}
+            <div
+              className="relative overflow-hidden"
+              style={{
+                height: "clamp(260px, 30vw, 400px)",
+                background: "linear-gradient(to bottom, rgba(196,82,42,0.12) 0%, rgba(247,243,240,1) 42%, white 72%)",
+              }}
+            >
+              <div className="absolute bottom-0 inset-x-0" style={{ height: "90%" }}>
+                <motion.img
+                  src="/Featured Project Hero Image.png"
+                  alt={featuredProject.title}
+                  initial={{ scale: 1.04, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                  className="w-full h-full object-cover object-left-top"
+                  style={{ borderRadius: "10px 10px 0 0", filter: "drop-shadow(0 -6px 18px rgba(0,0,0,0.09))" }}
+                />
+              </div>
+
+              {/* Floating metric chip */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute bottom-6 left-8 z-10"
+              >
+                <motion.div
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 3.2, ease: "easeInOut", repeat: Infinity }}
+                  className="px-4 py-2.5 rounded-xl flex items-center gap-3"
+                  style={{ background: "#ffffff", border: "1px solid #e7e5e4", boxShadow: "0 4px 16px rgba(0,0,0,0.10)" }}
+                >
+                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--terra-500)" }} />
+                  <div>
+                    <div className="text-[12px] font-bold" style={{ color: "var(--terra-500)" }}>40% fewer QA cycles</div>
+                    <div className="text-[12px] text-stone-500">AI-caught before handoff</div>
+                  </div>
+                </motion.div>
+              </motion.div>
             </div>
 
-            <div className="relative p-8 lg:p-12">
-              {/* Two-column layout on desktop */}
-              <div className="flex flex-col lg:flex-row lg:gap-12">
-                {/* Left column — text + CTA */}
-                <div className="flex-1 min-w-0">
-                  <span className={`inline-block px-3 py-1.5 rounded-full text-xs mb-5 ${isDark ? "bg-blue-500/20 border border-blue-500/30 text-blue-300" : "bg-blue-500/10 border border-blue-500/20 text-blue-700"}`}>
-                    {featuredProject.category}
-                  </span>
+            {/* Content below */}
+            <div className="p-8 lg:p-12">
+              <div className="flex flex-col lg:flex-row lg:gap-16 lg:items-start">
 
-                  <h3 className={`text-3xl md:text-4xl lg:text-5xl tracking-tighter mb-3 leading-tight ${isDark ? "" : "text-gray-900"}`}>
+                {/* Left: tags + title */}
+                <div className="flex-1 min-w-0 lg:max-w-[48%]">
+                  <div className="flex flex-wrap items-center gap-5 mb-5 text-[12px]">
+                    <HighlightMark delay={0.2}>{featuredProject.category}</HighlightMark>
+                    <span className="text-stone-400">·</span>
+                    <HighlightMark delay={0.45}>{featuredProject.clientSize}</HighlightMark>
+                    <span className="text-stone-400">·</span>
+                    <HighlightMark delay={0.7}>{featuredProject.timeline}</HighlightMark>
+                  </div>
+                  <h3
+                    className="font-bold tracking-tight leading-tight"
+                    style={{ fontSize: "clamp(1.5rem, 3vw, 2.4rem)", fontFamily: "var(--font-display)", color: "#1c1917" }}
+                  >
                     {featuredProject.title}
                   </h3>
-                  <p className={`text-base lg:text-lg leading-relaxed mb-6 ${isDark ? "text-white/55" : "text-gray-500"}`}>
-                    Unified 3 platforms under one AI-assisted design system — catching accessibility issues before handoff, not after.
+                </div>
+
+                {/* Right: description + CTA */}
+                <div className="flex-1 mt-6 lg:mt-0 flex flex-col gap-7 justify-center">
+                  <p className="text-base leading-relaxed text-stone-500">
+                    Unified 3 security platforms under one AI-assisted design system —
+                    catching accessibility issues before handoff, reducing QA cycles by 40%.
                   </p>
-
-                  {/* AI tools — minimal pills */}
-                  <div className="flex flex-wrap items-center gap-2 mb-6">
-                    <span className={`text-[10px] uppercase tracking-widest mr-1 ${isDark ? "text-white/25" : "text-gray-400"}`}>AI-powered</span>
-                    {[...new Set(featuredProject.aiWorkflow.flatMap(s => s.tool.split(" + ").map(t => t.trim())))].map((tool) => (
-                      <span
-                        key={tool}
-                        className={`px-2.5 py-0.5 rounded-full text-[11px] ${isDark ? "bg-violet-500/10 border border-violet-500/20 text-violet-300/70" : "bg-violet-50 border border-violet-500/15 text-violet-600/70"}`}
-                      >
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-
                   <Link
-                    to={`/project/${featuredProject.id}`}
-                    className="group inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full hover:shadow-[0_0_40px_rgba(37,99,235,0.5)] transition-all duration-300 relative overflow-hidden"
-                    style={{ color: "#ffffff" }}
+                    to={`/case-study/${featuredProject.id}`}
+                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200 text-sm font-semibold text-white self-start"
+                    style={{ background: "var(--terra-500)" }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
                   >
-                    <span className="relative z-10 text-sm">Read Full Case Study</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform relative z-10" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                    Read Full Case Study
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
 
-                {/* Right column — outcome metrics */}
-                <div className="flex flex-col gap-3 mt-8 lg:mt-0 lg:w-[320px] lg:flex-shrink-0 lg:justify-center">
-                  {featuredProject.outcomes.slice(0, 3).map((outcome, i) => {
-                    const match = outcome.match(/^(\d+(?:\.\d+)?(?:%|x|\+)?)\s+(.+)/i);
-                    return match ? (
-                      <div
-                        key={i}
-                        className={`px-5 py-3.5 rounded-xl flex items-baseline gap-3 ${isDark ? "bg-white/5 border border-blue-500/15" : "bg-blue-50/50 border border-blue-500/10"}`}
-                      >
-                        <span className={`text-2xl font-light tracking-tighter bg-clip-text text-transparent ${isDark ? "bg-gradient-to-br from-emerald-400 to-cyan-400" : "bg-gradient-to-br from-emerald-600 to-cyan-600"}`}>
-                          {match[1]}
-                        </span>
-                        <span className={`text-xs leading-snug capitalize ${isDark ? "text-white/50" : "text-gray-500"}`}>
-                          {match[2]}
-                        </span>
-                      </div>
-                    ) : null;
-                  })}
-                </div>
               </div>
             </div>
           </motion.div>
 
-          {/* ── 5. More Projects grid ──────────────────────────────────────────── */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {moreProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group relative"
-              >
-                <Link to={`/project/${project.id}`} className="block">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 opacity-0 group-hover:opacity-100" />
-                  <div className="relative overflow-hidden rounded-2xl border border-blue-500/20 group-hover:border-blue-500/30 transition-all">
-                    {/* Image */}
-                    <div className="relative h-48 overflow-hidden">
-                      <ImageWithFallback
-                        src={project.image}
-                        alt={project.title}
-                        className="w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      {/* Key outcome overlay */}
-                      {(() => {
-                        const match = project.outcomes[0]?.match(/^(\d+(?:\.\d+)?(?:%|x|\+)?)/i);
-                        return match ? (
-                          <div className="absolute bottom-3 left-3 px-2.5 py-1 bg-black/60 backdrop-blur-sm border border-emerald-500/30 rounded-lg text-xs text-emerald-400">
-                            {match[1]} impact
-                          </div>
-                        ) : null;
-                      })()}
+          {/* ── 2 project cards — connected cluster ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl overflow-hidden"
+            style={{ border: "1px solid #e7e5e4" }}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2">
+              {moreProjects.slice(0, 2).map((project, i) => {
+                const DomainIcon = PROJECT_DOMAIN_ICONS[i + 1] || Layers;
+                return (
+                  <Link
+                    key={project.id}
+                    to={`/case-study/${project.id}`}
+                    className="group cursor-pointer flex flex-col"
+                    style={{ borderLeft: i > 0 ? "1px solid #ece8e6" : undefined, textDecoration: "none" }}
+                  >
+                    {/* Image area — padded, blends into card like Key Decisions grid */}
+                    <div className="relative" style={{ height: "300px" }}>
+                      <motion.div
+                        className="absolute inset-9 bottom-6"
+                        initial={{ y: 22, opacity: 0 }}
+                        whileInView={{ y: 0, opacity: 1 }}
+                        viewport={{ once: true, margin: "-40px" }}
+                        transition={{ duration: 0.55, delay: 0.08 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <img
+                          src="/Hero Image.png"
+                          alt={project.title}
+                          className="w-full h-full object-cover object-top"
+                          style={{
+                            borderRadius: "10px 10px 0 0",
+                            filter: "drop-shadow(0 -6px 20px rgba(0,0,0,0.11))",
+                          }}
+                        />
+                      </motion.div>
                     </div>
-                    {/* Info */}
-                    <div className="p-5 bg-white/5">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs text-blue-300/60 uppercase tracking-wide">{project.category}</span>
-                        <span className="text-xs text-white/30">{project.industry}</span>
+
+                    {/* Content */}
+                    <div className="px-10 pt-10 pb-12 flex flex-col gap-7 flex-1">
+                      <div className="text-[11px]">
+                        <HighlightMark delay={0.2 + i * 0.2}>{project.category}</HighlightMark>
                       </div>
-                      <h3 className="text-lg tracking-tight text-white/90 group-hover:text-white transition-colors mb-1">
+                      <h3
+                        className="text-[16px] font-bold tracking-tight leading-snug text-stone-900"
+                        style={{ fontFamily: "var(--font-display)" }}
+                      >
                         {project.title}
                       </h3>
-                      <p className="text-sm text-white/45 line-clamp-2 leading-relaxed mb-4">
+                      <p className="text-[13px] line-clamp-2 leading-relaxed flex-1" style={{ color: "#78716c" }}>
                         {project.description}
                       </p>
-                      <div className="flex items-center gap-1.5 text-blue-400 text-sm group-hover:gap-2.5 transition-all">
-                        <span className="text-xs">View case study</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
+                      <div
+                        className="flex items-center gap-1 transition-all group-hover:gap-2 self-start"
+                        style={{ color: "var(--terra-500)" }}
+                      >
+                        <span className="text-[12px] font-medium">View case study</span>
+                        <ChevronRight className="w-3 h-3" />
                       </div>
                     </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── 6. Services / What's Included ───────────────────────────────────── */}
-      <WhoItsFor />
+      {/* ── 4. Testimonials ──────────────────────────────────────────────────── */}
+      <section
+        className="py-28 relative"
+        style={{ background: "#f5f5f4", borderTop: "1px solid #e7e5e4" }}
+      >
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
 
-      {/* ── 8. Testimonials ───────────────────────────────────────────────────── */}
-      <section className="py-32 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/10 to-transparent pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative">
+          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-16"
+            transition={{ duration: 0.5 }}
+            className="mb-10 flex items-end justify-between flex-wrap gap-4"
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-yellow-500/10 backdrop-blur-xl border border-yellow-500/20 rounded-full mb-6">
-              <Star className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm text-yellow-200/80 tracking-wide">Client Feedback</span>
+            <div>
+              <p
+                className="text-[12px] font-semibold tracking-[0.14em] uppercase mb-4"
+                style={{ color: "var(--terra-500)" }}
+              >
+                Client Feedback
+              </p>
+              <h2
+                className="font-bold tracking-tight"
+                style={{
+                  fontSize: "clamp(2rem, 4vw, 3.2rem)",
+                  fontFamily: "var(--font-display)",
+                  color: "#1c1917",
+                }}
+              >
+                What clients say.
+              </h2>
             </div>
-            <h2 className="text-5xl md:text-6xl tracking-tighter">
-              <span className="bg-gradient-to-r from-blue-200 via-cyan-200 to-indigo-200 bg-clip-text text-transparent">
-                What clients say
-              </span>
-            </h2>
+            <div
+              className="flex items-center gap-2 px-4 py-2 rounded-full self-start"
+              style={{ background: "#ffffff", border: "1px solid #e7e5e4" }}
+            >
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-3 h-3" fill="var(--terra-500)" style={{ color: "var(--terra-500)" }} />
+                ))}
+              </div>
+              <span className="text-[12px] font-medium text-stone-600">5.0 on Upwork</span>
+            </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {TESTIMONIALS.map((t, index) => (
-              <motion.div
-                key={t.name}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ y: -4 }}
-                className="relative group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/8 to-cyan-600/5 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500" />
-                <div className="relative p-8 bg-white/5 backdrop-blur-xl border border-blue-500/20 rounded-3xl group-hover:border-blue-500/30 transition-all h-full flex flex-col">
-                  <div className="flex gap-1 mb-6">
-                    {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+          {/* World Map */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-5"
+          >
+            <WorldMap activeIndex={activeTestimonial} />
+          </motion.div>
+
+          {/* Testimonial cards — click to activate */}
+          <div
+            className="grid grid-cols-1 md:grid-cols-3 gap-4"
+            onMouseEnter={() => setPauseAutoRotate(true)}
+            onMouseLeave={() => setPauseAutoRotate(false)}
+          >
+            {TESTIMONIALS.map((t, i) => {
+              const isActive = i === activeTestimonial;
+              return (
+                <motion.button
+                  key={t.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.45, delay: i * 0.10, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -4 }}
+                  onClick={() => setActiveTestimonial(i)}
+                  className="text-left p-7 rounded-2xl flex flex-col gap-4 transition-all duration-300 w-full"
+                  style={{
+                    background: isActive ? "#ffffff" : "rgba(255,255,255,0.5)",
+                    border: isActive ? "1px solid #d6d3d1" : "1px solid #e7e5e4",
+                    boxShadow: isActive ? "0 4px 20px rgba(0,0,0,0.07)" : "none",
+                  }}
+                >
+                  {/* Quote mark */}
+                  <div
+                    className="text-4xl font-bold leading-none select-none"
+                    style={{ color: isActive ? "var(--terra-400)" : "var(--terra-light)", fontFamily: "var(--font-display)", lineHeight: 0.9 }}
+                  >"</div>
+
+                  {/* Quote */}
+                  <p className="text-[14px] leading-relaxed flex-1 text-stone-600 -mt-1">
+                    {t.quote}
+                  </p>
+
+                  {/* Stars */}
+                  <div className="flex gap-0.5">
+                    {[...Array(t.rating)].map((_, j) => (
+                      <Star key={j} className="w-3 h-3" fill={isActive ? "var(--terra-500)" : "#d6d3d1"} style={{ color: isActive ? "var(--terra-500)" : "#d6d3d1" }} />
                     ))}
                   </div>
-                  <blockquote className="text-white/65 leading-relaxed mb-8 flex-1 text-[0.95rem]">
-                    "{t.quote}"
-                  </blockquote>
-                  <div>
-                    <div className="text-white font-medium">{t.name}</div>
-                    <div className="text-sm text-blue-300/60">{t.role}</div>
-                    <div className="text-xs text-white/30 mt-0.5">{t.company}</div>
+
+                  {/* Attribution */}
+                  <div className="flex items-center gap-3 pt-3" style={{ borderTop: `1px solid ${isActive ? "#e7e5e4" : "#ece9e6"}` }}>
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0"
+                      style={{
+                        background: isActive ? "var(--terra-light)" : "#ece9e6",
+                        border: `1px solid ${isActive ? "var(--terra-border)" : "#e2ded9"}`,
+                        color: isActive ? "var(--terra-500)" : "#78716c",
+                        fontFamily: "var(--font-display)",
+                      }}
+                    >
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="text-[14px] font-semibold text-stone-800">{t.name}</div>
+                      <div className="text-[12px] text-stone-500">{t.role} · {t.company}</div>
+                      <div className="text-[12px] mt-0.5" style={{ color: isActive ? "var(--terra-500)" : "#78716c" }}>{t.location}</div>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.button>
+              );
+            })}
           </div>
+
+          {/* Upwork CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-5 flex items-center justify-between p-5 rounded-2xl"
+            style={{ background: "#ffffff", border: "1px solid #e7e5e4" }}
+          >
+            <p className="text-[14px] text-stone-500">
+              More verified client reviews available on my Upwork profile.
+            </p>
+            <a
+              href="https://upwork.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200"
+              style={{ border: "1px solid #e7e5e4", color: "#57534e" }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = "#1c1917"}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = "#e7e5e4"}
+            >
+              View Upwork profile
+              <ArrowRight className="w-3.5 h-3.5" />
+            </a>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── 9. About ──────────────────────────────────────────────────────────── */}
-      <section id="about" className="py-32 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-950/15 to-transparent pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative">
+      {/* ── 5. How I Work ────────────────────────────────────────────────────── */}
+      <IcebergSection />
+
+      {/* ── 6. Services ──────────────────────────────────────────────────────── */}
+      <section id="services" style={{ background: "#f5f5f4", borderTop: "1px solid #e7e5e4" }}>
+        <WhoItsFor />
+      </section>
+
+      {/* ── 7. About ──────────────────────────────────────────────────────────── */}
+      <section
+        id="about"
+        className="py-32 relative"
+        style={{ background: "radial-gradient(ellipse at 100% 50%, rgba(196,82,42,0.05) 0%, transparent 48%), #ffffff", borderTop: "1px solid #e7e5e4" }}
+      >
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 relative">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-start">
+
             <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.7 }}
               className="lg:col-span-3"
             >
-              <h2 className="text-5xl md:text-7xl mb-8 tracking-tighter leading-tight">
-                <span className="block">UX Designer.</span>
-                <span className="block bg-gradient-to-r from-blue-300 via-cyan-300 to-indigo-300 bg-clip-text text-transparent">
-                  AI Practitioner.
-                </span>
+              <p
+                className="text-[12px] font-semibold tracking-[0.14em] uppercase mb-5"
+                style={{ color: "var(--terra-500)" }}
+              >
+                About
+              </p>
+              <h2
+                className="font-bold tracking-tight leading-tight mb-8"
+                style={{
+                  fontSize: "clamp(2.2rem, 5vw, 4rem)",
+                  fontFamily: "var(--font-display)",
+                  color: "#1c1917",
+                }}
+              >
+                UX Designer.<br />
+                <span style={{ color: "#8c8680" }}>AI Practitioner.</span>
               </h2>
-              <div className="space-y-5 text-lg text-white/55 leading-relaxed">
+              <div className="space-y-5 text-[16px] leading-relaxed text-stone-500">
                 <p>
-                  I'm a UX designer who's spent years building products at the intersection of user
-                  needs and business goals — and the last few years specifically building AI into every
-                  part of that process.
+                  I'm Harsha — a UX designer with 9 years of experience building products at the
+                  intersection of user needs and business goals — and the last few years specifically
+                  building AI into every part of that process.
                 </p>
                 <p>
                   That means research synthesis in hours, more design directions per dollar, and
@@ -882,98 +1191,193 @@ export default function Homepage() {
                   move carefully.
                 </p>
               </div>
+              <a
+                href="#contact"
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold mt-8 transition-colors duration-200 group"
+                style={{ color: "var(--terra-500)" }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "var(--terra-600)"}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "var(--terra-500)"}
+              >
+                Get in touch
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </a>
             </motion.div>
 
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-2 space-y-5"
+              transition={{ duration: 0.7 }}
+              className="lg:col-span-2 space-y-4"
             >
-              <div className="p-8 bg-gradient-to-br from-blue-600/8 to-cyan-600/8 backdrop-blur-xl border border-blue-500/20 rounded-3xl">
-                <h3 className="text-lg mb-5 tracking-tight flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-cyan-400" />
+              {/* Industries card */}
+              <div
+                className="p-7 rounded-2xl"
+                style={{ background: "#f5f5f4", border: "1px solid #e7e5e4" }}
+              >
+                <h3
+                  className="text-[13px] font-semibold mb-5 flex items-center gap-2 text-stone-700"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  <TrendingUp className="w-4 h-4" style={{ color: "var(--terra-500)" }} />
                   Industries Served
                 </h3>
                 <ul className="space-y-2.5">
-                  {["SaaS & Productivity Tools", "FinTech & Financial Services", "HealthTech & Wellness", "Enterprise Software", "Consumer Mobile Apps", "AI & Data Products"].map((ind) => (
-                    <li key={ind} className="flex items-center gap-2 text-sm text-white/55">
-                      <span className="text-blue-400 text-xs">→</span>
+                  {[
+                    "SaaS & Productivity Tools",
+                    "FinTech & Financial Services",
+                    "HealthTech & Wellness",
+                    "Enterprise Software",
+                    "Consumer Mobile Apps",
+                    "AI & Data Products",
+                  ].map((ind) => (
+                    <li key={ind} className="flex items-center gap-2.5 text-[13px] text-stone-500">
+                      <span style={{ color: "var(--terra-500)" }}>→</span>
                       {ind}
                     </li>
                   ))}
                 </ul>
+              </div>
+
+              {/* Availability card */}
+              <div
+                className="p-5 rounded-2xl"
+                style={{ background: "var(--terra-light)", border: "1px solid var(--terra-border)" }}
+              >
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div
+                    className="w-2 h-2 rounded-full animate-pulse"
+                    style={{ background: "var(--terra-500)" }}
+                  />
+                  <span className="text-[13px] font-semibold" style={{ color: "var(--terra-500)" }}>
+                    Available for New Projects
+                  </span>
+                </div>
+                <p className="text-[12px] text-stone-500">
+                  Taking on select projects starting immediately. Proposals within 48 hours.
+                </p>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ── 10. Contact ───────────────────────────────────────────────────────── */}
-      <section id="contact" className="py-32 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.12),transparent_70%)]" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative">
+      {/* ── 8. Contact ───────────────────────────────────────────────────────── */}
+      <section
+        id="contact"
+        className="py-32 relative"
+        style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(196,82,42,0.07) 0%, transparent 55%), #f5f5f4", borderTop: "1px solid #e7e5e4" }}
+      >
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10 relative">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.7 }}
             className="max-w-4xl mx-auto"
           >
             <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500/10 backdrop-blur-xl border border-emerald-500/20 rounded-full mb-10">
-                <div className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-green-400 rounded-full animate-pulse" />
-                <span className="text-sm text-emerald-200/80 tracking-wide">Available for New Projects</span>
-              </div>
-              <h2 className="text-5xl md:text-7xl mb-8 tracking-tighter leading-tight">
-                <span className="block">Let's build</span>
-                <span className="block bg-gradient-to-r from-blue-300 via-cyan-300 to-indigo-300 bg-clip-text text-transparent">
-                  something great.
-                </span>
-              </h2>
-              <p className="text-xl text-white/45 mb-12 leading-relaxed max-w-2xl mx-auto">
-                Have a product to design, a system to fix, or a team to support? Tell me what you're working on.
+              <p
+                className="text-[12px] font-semibold tracking-[0.14em] uppercase mb-6"
+                style={{ color: "var(--terra-500)" }}
+              >
+                Contact
               </p>
+
+              {/* Available badge */}
+              <div
+                className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full mb-10"
+                style={{ background: "var(--terra-light)", border: "1px solid var(--terra-border)" }}
+              >
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--terra-500)" }} />
+                <span className="text-[12px] font-semibold" style={{ color: "var(--terra-500)" }}>
+                  Available for New Projects
+                </span>
+              </div>
+
+              <h2
+                className="font-bold tracking-tight leading-tight mb-8"
+                style={{
+                  fontSize: "clamp(2.2rem, 5.5vw, 4.2rem)",
+                  fontFamily: "var(--font-display)",
+                  color: "#1c1917",
+                }}
+              >
+                Let's build<br />
+                <span style={{ color: "#8c8680" }}>something great.</span>
+              </h2>
+
+              <p className="text-lg mb-12 leading-relaxed max-w-2xl mx-auto text-stone-500">
+                Have a product to design, a system to fix, or a team to support?
+                Tell me what you're working on.
+              </p>
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="mailto:hello@example.com"
-                  className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full hover:shadow-[0_0_40px_rgba(37,99,235,0.5)] transition-all duration-300 inline-flex items-center justify-center gap-2 relative overflow-hidden"
-                  style={{ color: "#ffffff" }}
+                  href="mailto:sreeharsha@alvyl.com"
+                  className="group px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-semibold text-white"
+                  style={{ background: "var(--terra-500)" }}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
                 >
-                  <span className="relative z-10">Start a Conversation</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                  Start a Conversation
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </a>
                 <a
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-4 bg-white/5 backdrop-blur-xl border border-blue-500/20 rounded-full hover:bg-blue-500/10 hover:border-blue-500/30 transition-all duration-300 inline-flex items-center justify-center"
+                  className="px-8 py-4 rounded-xl inline-flex items-center justify-center transition-all duration-200 text-sm font-medium"
+                  style={{ border: "1px solid #e7e5e4", color: "#57534e", background: "#ffffff" }}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = "#1c1917"}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = "#e7e5e4"}
                 >
                   Connect on LinkedIn
                 </a>
               </div>
             </div>
 
-            {/* What happens next */}
+            {/* Process steps — icons replace numbers */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { step: "01", title: "Send a message", description: "Tell me about your project — what you're building, your timeline, and what help you need." },
-                { step: "02", title: "30-min discovery call", description: "We'll discuss your goals, constraints, and whether my approach is the right fit." },
-                { step: "03", title: "Proposal in 48 hours", description: "A clear scope, timeline, and pricing proposal. No vague estimates, no surprise fees." },
+                {
+                  icon: MessageSquare,
+                  title: "Send a message",
+                  description: "Tell me about your project — what you're building, your timeline, and what help you need.",
+                },
+                {
+                  icon: Video,
+                  title: "30-min discovery call",
+                  description: "We'll discuss your goals, constraints, and whether my approach is the right fit.",
+                },
+                {
+                  icon: FileText,
+                  title: "Proposal in 48 hours",
+                  description: "A clear scope, timeline, and pricing proposal. No vague estimates, no surprise fees.",
+                },
               ].map((item, index) => (
                 <motion.div
-                  key={item.step}
+                  key={item.title}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 bg-white/5 backdrop-blur-xl border border-blue-500/15 rounded-2xl"
+                  className="p-6 rounded-2xl"
+                  style={{ background: "#ffffff", border: "1px solid #e7e5e4" }}
                 >
-                  <div className="text-3xl font-light text-white/8 mb-3">{item.step}</div>
-                  <h4 className="text-white/90 font-medium mb-2">{item.title}</h4>
-                  <p className="text-sm text-white/45 leading-relaxed">{item.description}</p>
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
+                    style={{ background: "var(--terra-light)", border: "1px solid var(--terra-border)" }}
+                  >
+                    <item.icon className="w-4.5 h-4.5" style={{ color: "var(--terra-500)" }} />
+                  </div>
+                  <h4
+                    className="font-semibold mb-2 text-stone-800"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {item.title}
+                  </h4>
+                  <p className="text-[14px] leading-relaxed text-stone-500">{item.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -982,18 +1386,45 @@ export default function Homepage() {
       </section>
 
       {/* ── Footer ────────────────────────────────────────────────────────────── */}
-      <footer className={`border-t py-10 backdrop-blur-xl transition-colors duration-300 ${isDark ? "border-blue-500/15 bg-black/50" : "border-blue-500/10 bg-blue-50/50"}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-5">
-            <div className={`text-sm ${isDark ? "text-white/35" : "text-gray-400"}`}>© 2026 · AI-Powered UX Designer</div>
-            <div className={`flex gap-8 text-sm ${isDark ? "text-white/35" : "text-gray-400"}`}>
-              <a href="https://dribbble.com" className="hover:text-blue-500 transition-colors">Dribbble</a>
-              <a href="https://twitter.com" className="hover:text-cyan-500 transition-colors">Twitter</a>
-              <a href="https://linkedin.com" className="hover:text-indigo-500 transition-colors">LinkedIn</a>
+      <footer
+        className="py-8"
+        style={{ background: "#ffffff", borderTop: "1px solid #e7e5e4" }}
+      >
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-[6px] h-[6px] rounded-full"
+                style={{ background: "var(--terra-500)" }}
+              />
+              <span
+                className="text-[12px] font-semibold tracking-[0.10em] uppercase text-stone-500"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                Harsha
+              </span>
+              <span className="text-stone-400 text-[12px]">· UX Designer · © 2026</span>
+            </div>
+            <div className="flex gap-7 text-[12px] text-stone-500">
+              {["Dribbble", "Twitter", "LinkedIn"].map((link) => (
+                <a
+                  key={link}
+                  href={`https://${link.toLowerCase()}.com`}
+                  className="transition-colors duration-200 hover:text-stone-700"
+                >
+                  {link}
+                </a>
+              ))}
             </div>
           </div>
         </div>
       </footer>
+
+      {/* ── Case Study Modal ─────────────────────────────────────────────────── */}
+      <CaseStudyModal
+        project={activeProject}
+        onClose={() => setActiveProjectId(null)}
+      />
     </div>
   );
 }
