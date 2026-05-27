@@ -8,6 +8,7 @@ import {
 import { projects } from "../data/projects";
 import Navigation from "./Navigation";
 import HighlightMark from "./HighlightMark";
+import MobileCarousel from "./MobileCarousel";
 
 // ─── Noise Shimmer ────────────────────────────────────────────────────────────
 
@@ -314,18 +315,18 @@ export default function CaseStudyPage() {
             {/* Metadata */}
             <motion.div {...fadeUp(0.05)} className="flex flex-wrap items-center gap-5 mb-7 text-[12px]">
               <HighlightMark delay={0.2}>{category}</HighlightMark>
-              <span style={{ color: "#e7e5e4" }} className="text-[10px]">·</span>
+              <span style={{ color: "#e7e5e4" }} className="hidden sm:inline text-[10px]">·</span>
               <HighlightMark delay={0.4}>{role}</HighlightMark>
-              <span style={{ color: "#e7e5e4" }} className="text-[10px]">·</span>
+              <span style={{ color: "#e7e5e4" }} className="hidden sm:inline text-[10px]">·</span>
               <HighlightMark delay={0.6}>{timeline}</HighlightMark>
-              <span style={{ color: "#e7e5e4" }} className="text-[10px]">·</span>
+              <span style={{ color: "#e7e5e4" }} className="hidden sm:inline text-[10px]">·</span>
               <HighlightMark delay={0.8}>{industry}</HighlightMark>
             </motion.div>
 
             {/* Title */}
             <motion.h1
               {...fadeUp(0.1)}
-              className="text-[38px] sm:text-[48px] lg:text-[58px] font-bold leading-[1.07] tracking-[-0.025em] text-stone-900 max-w-[800px] mb-6"
+              className="text-[32px] sm:text-[48px] lg:text-[58px] font-bold leading-[1.1] tracking-[-0.025em] text-stone-900 max-w-[800px] mb-6"
               style={{ fontFamily: "var(--font-display)" }}
             >
               {title}
@@ -342,15 +343,27 @@ export default function CaseStudyPage() {
               </motion.p>
             )}
 
-            {/* Hero image — load reveal (card slides up + image zooms out) + scroll parallax */}
+            {/* Hero image —
+                MOBILE: a plain <img> at natural aspect (w-full, h-auto)
+                  → zero cropping, zero empty bars, no background tint.
+                  The image is exactly what it is.
+                DESKTOP (lg+): cinematic clamp container + object-cover
+                  crop + scroll parallax + load-reveal zoom. */}
             <motion.div
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.22 }}
               className="relative rounded-2xl overflow-hidden w-full"
-              style={{ height: "clamp(260px, 38vw, 500px)" }}
             >
-              <div ref={heroRef} className="absolute inset-0">
+              {/* MOBILE — natural-aspect image */}
+              <img
+                src="/Featured Project Hero Image.png"
+                alt={title}
+                className="block lg:hidden w-full h-auto"
+              />
+
+              {/* DESKTOP — original cropped + parallax treatment */}
+              <div ref={heroRef} className="hidden lg:block relative" style={{ height: "clamp(340px, 50vw, 500px)" }}>
                 <motion.div
                   initial={{ scale: 1.08 }}
                   animate={{ scale: 1.0 }}
@@ -376,7 +389,7 @@ export default function CaseStudyPage() {
 
         {/* ── CONTEXT ──────────────────────────────────────────────────────── */}
         <section
-          className="py-24 lg:py-32"
+          className="py-16 lg:py-32"
           style={{
             background: "radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px) 0 0 / 26px 26px, radial-gradient(ellipse at 90% 0%, rgba(196,82,42,0.05) 0%, transparent 52%), #ffffff",
           }}
@@ -437,7 +450,7 @@ export default function CaseStudyPage() {
         {/* ── KEY DECISIONS ─────────────────────────────────────────────────── */}
         {keyDecisions && keyDecisions.length > 0 && (
           <section
-            className="py-24 lg:py-32"
+            className="py-16 lg:py-32"
             style={{
               background: "radial-gradient(circle, rgba(0,0,0,0.028) 1px, transparent 1px) 0 0 / 26px 26px, radial-gradient(ellipse at 100% 0%, rgba(196,82,42,0.05) 0%, transparent 50%), #ffffff",
             }}
@@ -486,8 +499,10 @@ export default function CaseStudyPage() {
                         />
                       </div>
                     </div>
-                    {/* Text — bottom */}
-                    <div className="p-10 lg:p-14">
+                    {/* Text — bottom. Tighter padding on mobile so a
+                        375px card uses its real estate instead of
+                        burning half of it on margins. */}
+                    <div className="p-6 sm:p-10 lg:p-14">
                       <div className="flex items-center gap-2.5 mb-5">
                         <Icon size={18} style={{ color: "var(--terra-500)" }} strokeWidth={1.75} />
                         <span className="text-[11px] font-bold tracking-[0.1em] uppercase" style={{ color: "var(--terra-500)" }}>
@@ -495,7 +510,7 @@ export default function CaseStudyPage() {
                         </span>
                       </div>
                       <h3
-                        className="text-[20px] sm:text-[24px] font-bold tracking-[-0.015em] text-stone-900 mb-4 leading-[1.25]"
+                        className="text-[22px] sm:text-[24px] font-bold tracking-[-0.015em] text-stone-900 mb-4 leading-[1.25]"
                         style={{ fontFamily: "var(--font-display)" }}
                       >
                         {keyDecisions[0].title}
@@ -504,7 +519,7 @@ export default function CaseStudyPage() {
                         {keyDecisions[0].description}
                       </p>
                       {keyDecisions[0].artefacts && keyDecisions[0].artefacts.length > 0 && (
-                        <div className="flex flex-wrap gap-10 mt-7 pt-6 border-t border-stone-100 text-[13px]">
+                        <div className="flex flex-wrap gap-x-6 gap-y-3 sm:gap-10 mt-7 pt-6 border-t border-stone-100 text-[13px]">
                           {keyDecisions[0].artefacts.map((a, idx) => (
                             <ArtefactTag key={idx} delay={0.25 + idx * 0.15} index={idx}>{a}</ArtefactTag>
                           ))}
@@ -515,10 +530,11 @@ export default function CaseStudyPage() {
                 );
               })()}
 
-              {/* Decisions 02–05 — connected 2×2 cluster, no gaps */}
+              {/* Decisions 02–05 — DESKTOP: connected 2×2 cluster, no gaps.
+                  Hidden on mobile; mobile gets a swipe carousel below. */}
               <motion.div
                 {...fadeUp(0.12)}
-                className="rounded-2xl overflow-hidden"
+                className="hidden lg:block rounded-2xl overflow-hidden"
                 style={{ border: "1px solid #ece8e6" }}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2">
@@ -537,13 +553,14 @@ export default function CaseStudyPage() {
                         key={i}
                         className={`flex flex-col bg-white ${dividerClass}`}
                       >
-                        {/* Image — padded within card, background breathes around it */}
+                        {/* Image — padded within card, background breathes around it.
+                            Mobile uses smaller insets so the screenshot
+                            isn't shrunken inside the card frame. */}
                         <div
-                          className="relative"
-                          style={{ height: "340px" }}
+                          className="relative h-[260px] sm:h-[340px]"
                         >
                           <motion.div
-                            className="absolute inset-10 bottom-8 overflow-hidden"
+                            className="absolute inset-6 bottom-5 sm:inset-10 sm:bottom-8 overflow-hidden"
                             initial={{ y: 22, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             viewport={{ once: true, margin: "-40px" }}
@@ -562,8 +579,9 @@ export default function CaseStudyPage() {
                             />
                           </motion.div>
                         </div>
-                        {/* Text — bottom */}
-                        <div className="p-10 flex flex-col gap-5 flex-1">
+                        {/* Text — bottom. Mobile gets tighter padding
+                            so each cluster card fits nicely on a phone. */}
+                        <div className="p-6 sm:p-10 flex flex-col gap-5 flex-1">
                           <div className="flex items-center gap-2">
                             <Icon size={15} style={{ color: "var(--terra-500)" }} strokeWidth={1.75} />
                             <span className="text-[10px] font-bold tracking-[0.1em] uppercase" style={{ color: "var(--terra-500)" }}>
@@ -580,7 +598,7 @@ export default function CaseStudyPage() {
                             {decision.description}
                           </p>
                           {decision.artefacts && decision.artefacts.length > 0 && (
-                            <div className="flex flex-wrap gap-9 mt-2 pt-5 border-t border-stone-100 text-[12px]">
+                            <div className="flex flex-wrap gap-x-5 gap-y-2.5 sm:gap-9 mt-2 pt-5 border-t border-stone-100 text-[12px]">
                               {decision.artefacts.map((a, idx) => (
                                 <ArtefactTag key={idx} delay={0.2 + idx * 0.15} index={idx}>{a}</ArtefactTag>
                               ))}
@@ -592,6 +610,80 @@ export default function CaseStudyPage() {
                   })}
                 </div>
               </motion.div>
+
+              {/* MOBILE — Decisions 02–05 as a horizontal swipe carousel.
+                  Featured Decision 01 sits above (full-width hero card);
+                  the remaining 4 are best-explored one-at-a-time on a
+                  phone, with pagination dots to signal there's more and
+                  edge-to-edge cards for a real mobile-product feel. */}
+              <div className="lg:hidden">
+                <p
+                  className="text-[11px] font-bold tracking-[0.16em] uppercase mb-4"
+                  style={{ color: "var(--terra-500)" }}
+                >
+                  What's next
+                </p>
+                <MobileCarousel
+                  cardWidthPercent={88}
+                  gap={14}
+                  snap="start"
+                  ariaLabel="Other key decisions"
+                >
+                  {keyDecisions.slice(1).map((decision, i) => {
+                    const meta = DECISION_META[i + 1] ?? DECISION_META[0];
+                    const { Icon } = meta;
+                    const imgSrc =
+                      i === 0 ? "/Final Deep Navigation.png" :
+                      i === 1 ? "/Final Collaboration.png" :
+                      i === 2 ? "/Final Principles.png" :
+                                "/Final Design System.png";
+                    return (
+                      <div
+                        key={i}
+                        className="flex flex-col bg-white rounded-2xl overflow-hidden h-full"
+                        style={{ border: "1px solid #ece8e6" }}
+                      >
+                        {/* Image area */}
+                        <div className="relative h-[220px]">
+                          <div className="absolute inset-5 bottom-3 overflow-hidden" style={{ borderRadius: "10px 10px 0 0" }}>
+                            <img
+                              src={imgSrc}
+                              alt={decision.title}
+                              className="w-full h-full object-contain object-bottom"
+                              style={{ filter: "drop-shadow(0 -4px 14px rgba(0,0,0,0.08))" }}
+                            />
+                          </div>
+                        </div>
+                        {/* Text */}
+                        <div className="p-6 flex flex-col gap-4 flex-1">
+                          <div className="flex items-center gap-2">
+                            <Icon size={15} style={{ color: "var(--terra-500)" }} strokeWidth={1.75} />
+                            <span className="text-[10px] font-bold tracking-[0.1em] uppercase" style={{ color: "var(--terra-500)" }}>
+                              {meta.category}
+                            </span>
+                          </div>
+                          <h3
+                            className="text-[17px] font-bold tracking-[-0.01em] text-stone-900 leading-[1.3]"
+                            style={{ fontFamily: "var(--font-display)" }}
+                          >
+                            {decision.title}
+                          </h3>
+                          <p className="text-[13.5px] leading-[1.7]" style={{ color: "#78716c" }}>
+                            {decision.description}
+                          </p>
+                          {decision.artefacts && decision.artefacts.length > 0 && (
+                            <div className="flex flex-wrap gap-x-5 gap-y-2 mt-1 pt-4 border-t border-stone-100 text-[12px]">
+                              {decision.artefacts.map((a, idx) => (
+                                <ArtefactTag key={idx} delay={0.2 + idx * 0.15} index={idx}>{a}</ArtefactTag>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </MobileCarousel>
+              </div>
             </div>
           </section>
         )}
@@ -602,7 +694,7 @@ export default function CaseStudyPage() {
         {/* ── IMPACT & OUTCOMES ─────────────────────────────────────────────── */}
         {impactItems && impactItems.length > 0 && (
           <section
-            className="pt-24 lg:pt-32 pb-0"
+            className="pt-16 lg:pt-32 pb-0"
             style={{ background: "radial-gradient(circle, rgba(0,0,0,0.036) 1px, transparent 1px) 0 0 / 26px 26px, #faf8f7" }}
           >
             <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
@@ -618,8 +710,10 @@ export default function CaseStudyPage() {
                 </h2>
               </motion.div>
 
-              {/* Outcome row — flex with animated vertical dividers */}
-              <div className="flex flex-col sm:flex-row items-stretch mb-20">
+              {/* Outcome row — 2×2 grid on mobile (better visual rhythm
+                  than a long vertical stack of 4 large bloom cards), then
+                  flex row with animated vertical dividers on tablet+. */}
+              <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:flex sm:flex-row sm:items-stretch sm:gap-0 mb-20">
                 {impactItems.map((item, i) => {
                   const Icon = IMPACT_ICONS[i] ?? Sparkles;
                   return (
@@ -640,12 +734,12 @@ export default function CaseStudyPage() {
 
                       <motion.div
                         {...fadeUp(0.06 + i * 0.1)}
-                        className="flex flex-col gap-8 flex-1 py-2"
+                        className="flex flex-col gap-5 sm:gap-8 flex-1 py-2"
                       >
-                        {/* Bloom icon */}
+                        {/* Bloom icon — smaller on mobile so it fits
+                            comfortably in a half-width grid cell. */}
                         <motion.div
-                          className="relative flex items-center justify-center"
-                          style={{ width: 80, height: 80 }}
+                          className="relative flex items-center justify-center w-[56px] h-[56px] sm:w-[80px] sm:h-[80px]"
                           initial={{ scale: 0.5, opacity: 0 }}
                           whileInView={{ scale: 1, opacity: 1 }}
                           viewport={{ once: true, margin: "-40px" }}
@@ -674,7 +768,7 @@ export default function CaseStudyPage() {
 
             </div>
 
-            <div className="pb-24 lg:pb-32" />
+            <div className="pb-16 lg:pb-32" />
           </section>
         )}
 
@@ -683,7 +777,7 @@ export default function CaseStudyPage() {
 
         {/* ── PROJECT ASSETS ────────────────────────────────────────────────── */}
         {projectAssets && projectAssets.length > 0 && (
-          <section className="py-24 lg:py-32" style={{ background: "#f7f4f1" }}>
+          <section className="py-16 lg:py-32" style={{ background: "#f7f4f1" }}>
             <div className="max-w-[1200px] mx-auto px-6 lg:px-10 mb-12">
               <div className="flex items-end justify-between">
                 {/* E1 — label + heading stagger first */}
@@ -734,14 +828,17 @@ export default function CaseStudyPage() {
               </div>
             </div>
 
-            {/* Carousel — E1 slides in from right, C1 spring track */}
+            {/* Carousel — DESKTOP version (spring-driven chevron nav).
+                Hidden on mobile because the chevron controls live in the
+                hidden-sm header row, leaving mobile users with no way to
+                navigate. */}
             <motion.div
               ref={carouselRef}
               initial={{ opacity: 0, x: 60 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.65, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className="overflow-hidden pl-6 lg:pl-10"
+              className="hidden lg:block overflow-hidden pl-6 lg:pl-10"
               style={{ maxWidth: "calc(1200px + 40px)", margin: "0 auto", paddingBottom: 60, marginBottom: -60 }}
             >
               {/* C1 — spring-physics track */}
@@ -786,6 +883,34 @@ export default function CaseStudyPage() {
               </motion.div>
             </motion.div>
 
+            {/* MOBILE carousel — touch-native scroll-snap with pagination
+                dots. Uses our reusable MobileCarousel and pipes the active
+                index back into assetIndex so the caption stays in sync. */}
+            <div className="lg:hidden">
+              <MobileCarousel
+                cardWidthPercent={86}
+                gap={14}
+                snap="center"
+                ariaLabel="Project screens"
+                onActiveChange={(i) => setAssetIndex(i)}
+              >
+                {projectAssets.map((asset, i) => (
+                  <img
+                    key={i}
+                    src={asset.src}
+                    alt={asset.caption ?? `Screen ${i + 1}`}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      display: "block",
+                      borderRadius: 12,
+                      filter: "drop-shadow(0 10px 28px rgba(100,75,50,0.14))",
+                    }}
+                  />
+                ))}
+              </MobileCarousel>
+            </div>
+
             {/* Caption */}
             <div className="max-w-[1200px] mx-auto px-6 lg:px-10 mt-8">
               <motion.p
@@ -806,7 +931,7 @@ export default function CaseStudyPage() {
         <div style={{ height: "1px", background: "linear-gradient(to right, transparent, #e7e5e4, transparent)" }} />
 
         {/* ── DESIGNING FOR AI ──────────────────────────────────────────────── */}
-        <section className="py-24 lg:py-36" style={{ background: "#1c1917" }}>
+        <section className="py-16 lg:py-36" style={{ background: "#1c1917" }}>
           <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
 
             <motion.div {...fadeUp(0)}>
@@ -857,7 +982,7 @@ export default function CaseStudyPage() {
 
         {/* ── REFLECTION / CLOSE ────────────────────────────────────────────── */}
         <section
-          className="py-24 lg:py-36"
+          className="py-16 lg:py-36"
           style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(196,82,42,0.04) 0%, transparent 52%), #faf8f7" }}
         >
           <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
