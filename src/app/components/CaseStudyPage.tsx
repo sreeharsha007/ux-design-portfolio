@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router";
 import { motion, useScroll, useTransform } from "motion/react";
 import {
   ArrowLeft, Sparkles, Network, Zap, Users, Brain,
-  Layers, ArrowRight, BarChart2, GitMerge, Compass, Target, Timer, ChevronLeft, ChevronRight,
+  Layers, ArrowRight, BarChart2, GitMerge, Compass, Target, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { projects } from "../data/projects";
 import Navigation from "./Navigation";
@@ -195,7 +195,7 @@ const DECISION_META: { Icon: React.ElementType; category: string; objectPos: str
 
 // ─── Impact outcome icons ──────────────────────────────────────────────────────
 
-const IMPACT_ICONS: React.ElementType[] = [Target, Timer, Layers];
+const IMPACT_ICONS: React.ElementType[] = [Target, Brain, Zap, Layers];
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
@@ -543,7 +543,7 @@ export default function CaseStudyPage() {
                           style={{ height: "340px" }}
                         >
                           <motion.div
-                            className="absolute inset-10 bottom-0 overflow-hidden"
+                            className="absolute inset-10 bottom-8 overflow-hidden"
                             initial={{ y: 22, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             viewport={{ once: true, margin: "-40px" }}
@@ -551,10 +551,14 @@ export default function CaseStudyPage() {
                             style={{ borderRadius: "10px 10px 0 0" }}
                           >
                             <img
-                              src={i === 0 ? "/WID 1.png" : "/Featured Project Hero Image.png"}
+                              src={i === 0 ? "/Final Deep Navigation.png" : i === 1 ? "/Final Collaboration.png" : i === 2 ? "/Final Principles.png" : "/Final Design System.png"}
                               alt={decision.title}
-                              className="w-full h-full object-cover object-left-top"
-                              style={{ filter: "drop-shadow(0 -4px 14px rgba(0,0,0,0.08))" }}
+                              className="w-full h-full object-contain object-bottom"
+                              style={{
+                                filter: "drop-shadow(0 -4px 14px rgba(0,0,0,0.08))",
+                                transform: i === 2 ? "scale(0.92)" : undefined,
+                                transformOrigin: "bottom center",
+                              }}
                             />
                           </motion.div>
                         </div>

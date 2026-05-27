@@ -15,12 +15,29 @@ export default function CustomCursor() {
   const [state, setState] = useState<CursorState>("default");
   const [visible, setVisible] = useState(false);
   const [nibAngle, setNibAngle] = useState(-45); // default calligraphy nib angle
+  const [isIdle, setIsIdle] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
   const trailPoints = useRef<Array<{ x: number; y: number; t: number; w: number }>>([]);
   const rafRef = useRef<number>();
   const lastAngleUpdate = useRef(0);
+  const idleTimer = useRef<number>();
+
+  // Hide native cursor on fine-pointer devices
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: fine)");
+    if (!mq.matches) return;
+    const style = document.createElement("style");
+    style.setAttribute("data-custom-cursor", "");
+    style.textContent = `
+      @media (pointer: fine) {
+        html, body, *, *::before, *::after { cursor: none !important; }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => { style.remove(); };
+  }, []);
 
   // Canvas RAF loop — clears and redraws trail with time-based fade
   useEffect(() => {
@@ -103,6 +120,11 @@ export default function CustomCursor() {
       mouseX.set(x);
       mouseY.set(y);
       if (!visible) setVisible(true);
+
+      // Reset idle timer
+      if (isIdle) setIsIdle(false);
+      window.clearTimeout(idleTimer.current);
+      idleTimer.current = window.setTimeout(() => setIsIdle(true), 900);
     };
 
     const onOver = (e: MouseEvent) => {
@@ -135,7 +157,10 @@ export default function CustomCursor() {
       document.removeEventListener("mouseleave", onDocLeave);
       document.removeEventListener("mouseenter", onDocEnter);
     };
-  }, [mouseX, mouseY, visible]);
+  }, [mouseX, mouseY, visible, isIdle]);
+
+  // Cleanup idle timer on unmount
+  useEffect(() => () => window.clearTimeout(idleTimer.current), []);
 
   return (
     <>
@@ -171,13 +196,20 @@ export default function CustomCursor() {
             height: state === "hovering" ? 20 : state === "clicking" ? 10 : 3,
             borderRadius:
               state === "hovering" || state === "clicking" ? "50%" : "1px",
-            rotate: state === "hovering" ? 0 : nibAngle,
+            rotate:
+              state === "hovering"
+                ? 0
+                : isIdle
+                  ? [nibAngle, nibAngle + 360]
+                  : nibAngle,
             opacity: state === "clicking" ? 0.65 : 1,
           }}
           transition={{
             duration: 0.18,
             ease: [0.22, 1, 0.36, 1],
-            rotate: { duration: 0.1, ease: "easeOut" },
+            rotate: isIdle
+              ? { duration: 2.8, ease: "linear", repeat: Infinity }
+              : { duration: 0.1, ease: "easeOut" },
           }}
         />
       </motion.div>

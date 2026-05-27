@@ -121,6 +121,14 @@
 
 /* Portfolio surface & text tokens */
 :root {
+  --terra-50:  #fef3c7;
+  --terra-100: #fde68a;
+  --terra-500: #d97706;
+  --terra-600: #b45309;
+
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:    "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
   --surface: #ffffff;
   --surface-secondary: rgba(0, 0, 0, 0.03);
   --surface-tertiary: rgba(0, 0, 0, 0.06);

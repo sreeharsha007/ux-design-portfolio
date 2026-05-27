@@ -10,6 +10,38 @@ export interface ProcessTimelineStep {
   description: string;
 }
 
+export interface ContextPoint {
+  title: string;
+  description: string;
+}
+
+export interface KeyDecision {
+  title: string;
+  description: string;
+  rationale?: string;
+  artefacts?: string[];
+}
+
+export interface ImpactItem {
+  title: string;
+  detail?: string;
+}
+
+export interface ProjectAsset {
+  src: string;
+  caption?: string;
+}
+
+export interface AIInProject {
+  summary: string;
+  points: Array<{ area: string; detail: string }>;
+}
+
+export interface LearningItem {
+  title: string;
+  detail: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -27,18 +59,30 @@ export interface Project {
   deliverables: string[];
   aiWorkflow: AIWorkflowStep[];
   processTimeline: ProcessTimelineStep[];
+  tagline?: string;
+  heroImage?: string;
+  context?: string;
+  contextPoints?: ContextPoint[];
+  keyDecisions?: KeyDecision[];
+  impactItems?: ImpactItem[];
+  aiInProject?: AIInProject;
+  learnings?: LearningItem[];
+  aiDesignNote?: string;
+  reflection?: string;
+  projectAssets?: ProjectAsset[];
+  nextPhase?: string[];
 }
 
 export const projects: Project[] = [
   {
     id: "ai-assistant",
-    title: "AI-Powered Design System",
-    category: "AI/ML Product",
-    description: "An intelligent design toolchain that uses machine learning to enforce consistency, flag accessibility issues, and generate on-brand component variants — reducing manual review cycles for a fast-moving product team.",
+    title: "AI-Native Security Intelligence Platform",
+    category: "AI Security Platform",
+    description: "An AI-native security platform that connects vulnerabilities across code, teams, and ownership — helping organisations see not just what's broken, but who owns it, why it matters, and how to act on it.",
     image: "https://images.unsplash.com/photo-1647356191320-d7a1f80ca777?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxBSSUyMG5ldXJhbCUyMG5ldHdvcmslMjB2aXN1YWxpemF0aW9ufGVufDF8fHx8MTc3MjA2OTExMnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     role: "Lead UX Designer",
     timeline: "8 months (2025)",
-    industry: "SaaS / Productivity",
+    industry: "Enterprise SaaS / Cybersecurity",
     clientSize: "Growth Stage (Series B)",
     problem: "The product team was shipping inconsistent UI across 3 platforms due to a sprawling, undocumented design system. Accessibility regressions were caught late in QA, and designers spent 30% of their time on component audits rather than solving user problems.",
     solution: "Built an AI-assisted design system layer on top of Figma that auto-flags inconsistencies, suggests accessible color pairings, and generates component variants from natural language prompts. Embedded linting directly into the design workflow so issues are caught before handoff — not after.",
@@ -99,7 +143,55 @@ export const projects: Project[] = [
         duration: "Week 11–12",
         description: "Handed off to engineering with full documentation, ran onboarding sessions with both teams"
       }
-    ]
+    ],
+    tagline: "Finding vulnerabilities was possible. Understanding them in context was not.",
+    context: "In modern organisations, resources, ownership, costs, and risks are spread across teams — making it difficult to trace accountability or prioritise what actually matters. As structures grow more layered, users need a faster way to access context, investigate issues, and align the right people around action. The market had tools that could surface security signals; very few could connect those signals to ownership, accountability, and business impact in a way that reflected how an organisation actually operates.",
+    contextPoints: [
+      { title: "Risk context was fragmented", description: "Technical findings were visible, but their relationship to ownership, organisational structure, and business impact was hard to trace." },
+      { title: "Accessing insights took too much effort", description: "Critical information was buried inside deep hierarchies — slowing down workflows where minutes matter." },
+      { title: "RCA was collaborative, the workflow was not", description: "Root cause analysis involved multiple teams, but the supporting experience was disjointed and hard to share." },
+    ],
+    keyDecisions: [
+      { title: "Making organisational complexity more intelligible", description: "Introduced a semantic layer during onboarding and mapping to better structure organisational information for both users and AI — creating a stronger basis for linking vulnerabilities to ownership, accountability, cost visibility, and business context.", rationale: "Before you can rank risk, the system has to understand who a risk belongs to. Structure first, intelligence second.", artefacts: ["Semantic schema", "Onboarding mapping"] },
+      { title: "Reducing dependence on drill-down navigation", description: "Introduced both global and contextual AI chat so users could retrieve answers, updates, and next steps without losing the ability to drill deeper when they needed to.", rationale: "Hierarchies are good for storage, bad for retrieval. Conversation collapses the path between question and answer.", artefacts: ["Chat surface spec", "Context handoff"] },
+      { title: "Reframing RCA around collaboration", description: "Shaped an AI-powered canvas that supported investigation in context, live team collaboration, and shareable outputs — closer to how teams actually resolve issues together.", rationale: "RCA is a team sport. The tool should reflect the crowd, not a single analyst's screen.", artefacts: ["RCA canvas", "Shareable report"] },
+      { title: "Grounding AI interactions in usability principles", description: "Used HCI principles to shape AI interactions so they felt understandable, responsive, and trustworthy in a high-stakes environment where misreading a signal has real consequences.", rationale: "In security, confidence matters as much as capability. If people can't read the AI, they won't act on it.", artefacts: ["Interaction heuristics", "Trust checklist"] },
+      { title: "Building a scalable design system foundation", description: "Established a scalable design system direction to support consistency, reuse, and faster product evolution as the platform grew from MVP into a multi-surface product.", rationale: "An early system costs a week. A missing one costs a quarter, every quarter, forever.", artefacts: ["Foundation tokens", "Component baseline"] },
+    ],
+    impactItems: [
+      { title: "MVP became clearer", detail: "Product framing and prioritisation helped define a more credible direction for funding and future growth." },
+      { title: "Organisational context became more intelligent", detail: "The semantic layer connected teams, resources, ownership, and vulnerabilities in a more meaningful way." },
+      { title: "Investigation and reporting became more accessible", detail: "AI chat and collaborative workflows made it easier to find answers, investigate issues, and share outcomes across teams." },
+      { title: "Delivery became more scalable", detail: "A stronger design system and cleaner UI handoff reduced friction between design and implementation." },
+    ],
+    aiDesignNote: "One of the most important parts of this project was designing in a space where AI interaction patterns were still taking shape. Rather than treating AI as a layer on top of the interface, I approached it as part of the workflow itself — which required careful thinking around trust, system feedback, usability, and user control. In AI-led experiences, capability alone is not enough. Users need clarity, orientation, and confidence in how the system is helping them.",
+    reflection: "This project reinforced how important it is to design AI experiences around clarity, feedback, and control — especially in complex and high-stakes environments. It also surfaced a broader lesson: when designing emerging AI products, the challenge is not only shaping the intelligence itself, but shaping the interaction patterns that help people trust and use that intelligence effectively.",
+    projectAssets: [
+      {
+        src: "/ChatGPT Image Apr 22, 2026, 10_46_47 PM.png",
+        caption: "Semantic onboarding — mapping teams, ownership, and resources into organizational context the AI can reason about.",
+      },
+      {
+        src: "/ChatGPT Image Apr 23, 2026, 12_34_56 PM.png",
+        caption: "Global overview — vulnerabilities connected to the teams and business areas that own the risk.",
+      },
+      {
+        src: "/ChatGPT Image Apr 23, 2026, 12_48_33 PM.png",
+        caption: "Contextual AI chat — pulling prioritized answers without drilling through hierarchies.",
+      },
+      {
+        src: "/ChatGPT Image Apr 23, 2026, 01_02_26 PM.png",
+        caption: "Vulnerability deep-dive — evidence, ownership trail, and recommended actions in one frame.",
+      },
+      {
+        src: "/ChatGPT Image Apr 23, 2026, 01_05_00 PM.png",
+        caption: "RCA canvas — cross-functional root cause investigation with shareable outputs.",
+      },
+      {
+        src: "/ChatGPT Image Apr 23, 2026, 02_19_25 PM.png",
+        caption: "System view — scalable design foundations supporting consistency as the platform grows.",
+      },
+    ],
   },
   {
     id: "neural-insights",
@@ -170,6 +262,40 @@ export const projects: Project[] = [
         duration: "Week 10–11",
         description: "Final handoff with annotated specs, edge case documentation, and a live walkthrough with the engineering team"
       }
+    ],
+    tagline: "Analytics that speak business, not model telemetry.",
+    context: "Business leaders at a 250-person enterprise were expected to make decisions from an AI analytics dashboard built for data engineers. Every exec-level question became a ticket to the data team. Trust in the product was eroding — not because the data was wrong, but because no one at the top could read it.",
+    contextPoints: [
+      { title: "Wrong audience, wrong UI", description: "The dashboard exposed raw ML metrics — precision, recall, drift — to VPs who needed to know 'is this working for the business?'" },
+      { title: "Escalation overhead", description: "The data team handled 40+ basic questions per week from leadership, slowing their roadmap." },
+      { title: "Decisions delayed by days", description: "Leaders waited 3–4 days for the data team to produce interpretable answers before acting." },
+    ],
+    keyDecisions: [
+      { title: "Role-adaptive views", description: "One product, three density levels — exec, analyst, engineer — each rendered from the same data layer.", rationale: "A single dashboard cannot serve three audiences. Progressive disclosure was the only scalable answer.", artefacts: ["View matrix", "Density audit"] },
+      { title: "Translate metrics into money and risk", description: "Every technical metric gets a plain-language business equivalent alongside it.", rationale: "Execs act on revenue and risk language, not F1 scores. Teaching vocabulary at scale is slower than translating it.", artefacts: ["Metric translation map", "Exec lexicon"] },
+      { title: "Tooltips that teach, not define", description: "Hover states explain why a metric matters, not just what it is.", rationale: "Definitions are forgettable. Context sticks.", artefacts: ["Tooltip voice guide", "Learning patterns"] },
+      { title: "Same data layer, different surfaces", description: "All three views render from one data contract — no backfills, no forked queries, no drift between roles.", rationale: "Divergent views are the fastest way to break trust. Keep the numbers singular.", artefacts: ["Data contract", "Query catalogue"] },
+      { title: "Anomaly first, history second", description: "The exec home page opens on whatever has moved the most, not on last week's scorecard.", rationale: "Time-on-dashboard is not a goal. Noticing what's different is.", artefacts: ["Anomaly ranker", "Home hierarchy"] },
+    ],
+    impactItems: [
+      { title: "85% of non-technical users read correctly", detail: "Measured in moderated usability testing" },
+      { title: "60% fewer support tickets", detail: "Within 8 weeks of launch" },
+      { title: "3× weekly active usage in leadership", detail: "Compared to the previous dashboard" },
+      { title: "Same-day average time to decision", detail: "Down from 4 days pre-launch" },
+    ],
+    aiInProject: {
+      summary: "AI compressed the research and content phases from weeks to days — freeing design time for the parts that needed human judgement.",
+      points: [
+        { area: "Research synthesis", detail: "Claude clustered themes across 15 stakeholder interviews and 6 months of support tickets in an afternoon." },
+        { area: "IA exploration", detail: "GPT-4 generated and evaluated 8 information architectures against role-based jobs-to-be-done — enabling wider option-space exploration." },
+        { area: "Visualization concepts", detail: "Midjourney produced 20 visual directions for stakeholder review, turning a week of exploration into half a day." },
+        { area: "Plain-language metric copy", detail: "Claude drafted the business-translation tooltips for 40+ metrics — humans reviewed, sharpened, and signed off." },
+      ],
+    },
+    learnings: [
+      { title: "Progressive disclosure beats simplification", detail: "Hiding complexity for experts broke their workflow. Revealing complexity on demand preserved both audiences." },
+      { title: "Business language is a design decision", detail: "Naming metrics in money and risk terms wasn't copywriting — it was a framing choice that shaped every chart." },
+      { title: "Test with the real decision, not the interface", detail: "Tree tests and 5-second tests missed the real question — we switched to 'what would you do next?' tasks and got honest data." },
     ]
   },
   {
@@ -241,6 +367,40 @@ export const projects: Project[] = [
         duration: "Week 15–16",
         description: "Full spec handoff, component library documentation, engineer onboarding and QA support"
       }
+    ],
+    tagline: "An interface that adapts to the real world — not the lab it was tested in.",
+    context: "Field workers in logistics used the app in conditions the design team never saw: dim warehouses, cold-storage gloves, moving trucks. Task abandonment spiked outside business hours, and the support inbox filled with 'accidental tap' complaints. A one-size interface was failing the people the product existed for.",
+    contextPoints: [
+      { title: "The lab was lying", description: "Usability scores in the office were excellent. In the field, error rates tripled. The gap was environment, not interface logic." },
+      { title: "Motion and gloves broke touch targets", description: "Standard 44pt targets weren't enough for gloved taps on moving vehicles. Misfires cascaded into order errors." },
+      { title: "Fatigue, not features, was the issue", description: "By hour 6 of a shift, users needed fewer choices — not more guidance — and the interface didn't recognise that." },
+    ],
+    keyDecisions: [
+      { title: "Environment as a first-class input", description: "Ambient light, device motion, and connectivity feed into a state machine that adjusts target size, contrast, and density in real time.", rationale: "Adaptation has to be automatic. Asking tired field workers to change settings defeats the point.", artefacts: ["Sensor state machine", "Adaptation rules"] },
+      { title: "Field Mode: three actions, nothing else", description: "A simplified mode surfaces only the top three actions based on time-of-day and prior usage.", rationale: "In harsh conditions, the interface's job is to let someone finish — not to show them everything they could do.", artefacts: ["Field Mode spec", "Shortlist logic"] },
+      { title: "Prototype in the real environment", description: "Usability testing moved to warehouses and moving vehicles, not conference rooms.", rationale: "If the lab couldn't produce the failure mode, the lab couldn't validate the fix.", artefacts: ["In-field protocol", "Test rigs"] },
+      { title: "Larger targets by default, not a setting", description: "Every primary action is sized for a gloved tap — the 'regular' mode never re-appears.", rationale: "Accessibility you can turn off is accessibility most users never find.", artefacts: ["Target size guide", "Regression tests"] },
+      { title: "Offline is the default state", description: "Every screen assumes the connection is gone; syncs are background and silent when it returns.", rationale: "Trucks go through tunnels. Warehouses have dead zones. Offline-first is the only honest mode.", artefacts: ["Offline cache plan", "Sync reconciler"] },
+    ],
+    impactItems: [
+      { title: "45% better completion in low light", detail: "Field-tested across 4 warehouse locations" },
+      { title: "78% fewer accidental taps in motion", detail: "Measured with in-vehicle instrumentation" },
+      { title: "4.7 / 5 rating from field workers", detail: "Post-launch survey, n=312" },
+      { title: "30% growth in daily active usage", detail: "Within 60 days of rollout" },
+    ],
+    aiInProject: {
+      summary: "AI helped us see usage patterns that interviews alone would have missed, and accelerated the long tail of microcopy work.",
+      points: [
+        { area: "Field research synthesis", detail: "Claude + Otter processed 20+ field interviews overnight — themes surfaced in one working day, not two weeks." },
+        { area: "Scenario stress-testing", detail: "GPT-4 generated 40 edge-case usage scenarios — gloves, rain, 5% battery — that we walked designs through before prototyping." },
+        { area: "Environmental mood boards", detail: "Midjourney produced high-contrast UI direction for three lighting modes in an afternoon." },
+        { area: "Adaptive state microcopy", detail: "Claude drafted 60+ transition strings; humans picked the 30 that read well under pressure." },
+      ],
+    },
+    learnings: [
+      { title: "Context is a feature", detail: "Designing for the average user in the average environment is designing for no one. Environmental signals deserve the same treatment as user input." },
+      { title: "Field testing reshaped scope twice", detail: "Two features that tested well in the office failed in-vehicle — we cut them. The instinct to defend prior decisions is the enemy of good adaptation." },
+      { title: "Less is more under strain", detail: "Field Mode's 'three actions' rule felt reductive in review and indispensable in use. Cognitive load is a first-order constraint." },
     ]
   },
   {
@@ -313,6 +473,40 @@ export const projects: Project[] = [
         duration: "Week 19–20",
         description: "Phased handoff across 3 engineering squads, design QA for beta release, post-launch monitoring plan"
       }
+    ],
+    tagline: "Async work, without the context tax.",
+    context: "A 500-person enterprise across 12 time zones had grown faster than its communication norms. Slack threads went unresolved, email attachments went stale, and weekly sync meetings existed to patch over unclear async handoffs. The team was spending more time finding context than producing work.",
+    contextPoints: [
+      { title: "Fragmented by channel", description: "Every decision lived somewhere different — Slack, Notion, email, call recordings. Finding 'the latest' meant asking three people." },
+      { title: "Meetings compensated for bad async", description: "30+ weekly syncs existed to re-establish context that async handoffs had failed to carry." },
+      { title: "Notification overload, signal drought", description: "The average user received 90+ notifications per day and reported missing the ones that actually mattered." },
+    ],
+    keyDecisions: [
+      { title: "An AI context layer, not a new channel", description: "The product links related messages, files, and decisions automatically rather than adding another inbox.", rationale: "The problem wasn't too few tools — it was that tools didn't know about each other.", artefacts: ["Context graph", "Integration map"] },
+      { title: "Catch-up digest as the primary surface", description: "A role-aware three-minute overnight digest became the morning home screen for distributed teams.", rationale: "People returning to work don't want a firehose. They want the 10% of activity that needs them specifically.", artefacts: ["Digest template", "Relevance model"] },
+      { title: "Respect focus, explicitly", description: "Notification logic reads focus hours and time zones before it fires.", rationale: "Interrupting someone in their deep-work block at 2am local time is a bug, not a feature.", artefacts: ["Focus policy", "Quiet-hours rules"] },
+      { title: "Decisions are first-class objects", description: "Threads can be promoted to 'decisions' with owner, status, and linked context — searchable long after the conversation fades.", rationale: "Messages disappear. Decisions shouldn't have to be re-asked every quarter.", artefacts: ["Decision schema", "Thread promotion UX"] },
+      { title: "Async rituals replace standing meetings", description: "Structured templates for updates, handoffs, and check-ins let teams retire 40% of their recurring syncs.", rationale: "Meetings are a bandaid for async that doesn't carry context. Fix the async, lose the bandaid.", artefacts: ["Ritual templates", "Cadence guide"] },
+    ],
+    impactItems: [
+      { title: "55% less reported context-switching", detail: "From the post-launch user survey" },
+      { title: "70% fewer 'where is that?' messages", detail: "Measured via keyword tracking in Slack" },
+      { title: "40% fewer meetings", detail: "Replaced with structured async handoffs" },
+      { title: "+39 NPS improvement", detail: "From 22 to 61 in 3 months among power users" },
+    ],
+    aiInProject: {
+      summary: "AI accelerated qualitative research and workshop synthesis — the two phases that historically drown async projects in process before design begins.",
+      points: [
+        { area: "Survey + interview synthesis", detail: "Claude clustered 300 open-ended survey responses and 25 interviews in 3 days — a job that normally takes 3 weeks." },
+        { area: "Workshop clustering", detail: "GPT-4 + Miro auto-grouped 180 sticky notes into themes in 20 minutes, freeing workshop time for discussion rather than sorting." },
+        { area: "Feature ideation", detail: "Claude generated 50+ concepts mapped to job-to-be-done statements in one session — we kept 12." },
+        { area: "Demo narrative", detail: "Claude drafted the stakeholder-demo script and in-prototype microcopy at 4x our historical pace." },
+      ],
+    },
+    learnings: [
+      { title: "Notifications are a product, not a setting", detail: "Treating notification logic as a first-class design surface — not an afterthought — changed the adoption story more than any feature." },
+      { title: "Culture is downstream of defaults", detail: "Switching the default landing surface from the inbox to the digest shifted team behaviour within two weeks. Defaults matter more than docs." },
+      { title: "Async is a capability, not a style", detail: "Teams didn't need more async — they needed better async. The difference is product infrastructure, not etiquette guidelines." },
     ]
   }
 ];

@@ -11,6 +11,7 @@ import WhoItsFor from "./WhoItsFor";
 import IcebergSection from "./IcebergSection";
 import CaseStudyModal from "./CaseStudyModal";
 import HighlightMark from "./HighlightMark";
+import MobileCarousel from "./MobileCarousel";
 
 // ─── Noise Displacement Shimmer ──────────────────────────────────────────────
 
@@ -597,6 +598,68 @@ function TiltCard({
   );
 }
 
+// ─── MobileScrollCue ──────────────────────────────────────────────────────────
+// Floating "Scroll to explore" cue that sits FIXED at viewport bottom while
+// the hero is in view. Fades out on first scroll (≥40px). Mobile only.
+
+function MobileScrollCue() {
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      setHidden(window.scrollY > 40);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <motion.div
+      className="md:hidden fixed left-0 right-0 flex flex-col items-center pointer-events-none"
+      style={{
+        bottom: "max(20px, env(safe-area-inset-bottom))",
+        zIndex: 40,
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: hidden ? 0 : 1 }}
+      transition={{
+        opacity: { duration: hidden ? 0.18 : 0.6, delay: hidden ? 0 : 1.4 },
+      }}
+      aria-hidden={hidden}
+    >
+      <span
+        style={{
+          fontSize: 10,
+          letterSpacing: "0.22em",
+          color: "#a8a4a0",
+          textTransform: "uppercase",
+          fontWeight: 600,
+          fontFamily: "var(--font-body)",
+          marginBottom: 10,
+        }}
+      >
+        Scroll to explore
+      </span>
+      <motion.svg
+        width={12}
+        height={18}
+        viewBox="0 0 12 18"
+        fill="none"
+        animate={{ y: [0, 5, 0] }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden
+      >
+        <path
+          d="M6 1v12M2 10l4 4 4-4"
+          stroke="#a8a4a0"
+          strokeWidth={1.2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </motion.svg>
+    </motion.div>
+  );
+}
+
 // ─── Homepage ─────────────────────────────────────────────────────────────────
 
 export default function Homepage() {
@@ -693,25 +756,29 @@ export default function Homepage() {
           >
             <a
               href="#work"
-              className="group px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-semibold text-white"
-              style={{ background: "var(--terra-500)" }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
+              className="group px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-semibold"
+              style={{ background: "var(--terra-600)", color: "#ffffff" }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
             >
               See My Work
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
             <a
-              href="#how-i-work"
-              className="px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-medium"
-              style={{ border: "1px solid #e7e5e4", color: "#57534e" }}
+              href="#process"
+              className="px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-semibold"
+              style={{
+                border: "1px solid rgba(217,119,6,0.30)",
+                color: "var(--terra-500)",
+                background: "rgba(217,119,6,0.05)",
+              }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = "#1c1917";
-                (e.currentTarget as HTMLElement).style.color = "#1c1917";
+                (e.currentTarget as HTMLElement).style.borderColor = "rgba(217,119,6,0.50)";
+                (e.currentTarget as HTMLElement).style.background = "rgba(217,119,6,0.10)";
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = "#e7e5e4";
-                (e.currentTarget as HTMLElement).style.color = "#57534e";
+                (e.currentTarget as HTMLElement).style.borderColor = "rgba(217,119,6,0.30)";
+                (e.currentTarget as HTMLElement).style.background = "rgba(217,119,6,0.05)";
               }}
             >
               How I Work
@@ -733,43 +800,122 @@ export default function Homepage() {
             <span>Available for new projects</span>
           </motion.div>
         </div>
+
       </section>
 
+      {/* Mobile scroll-to-explore cue — FLOATING at viewport bottom (fixed).
+          Position fixed so it sits at the bottom of the screen regardless
+          of how tall the hero content is (on small phones the hero
+          overflows the viewport and the cue would otherwise be off-screen).
+          Auto-hides the moment the user starts scrolling. */}
+      <MobileScrollCue />
+
       {/* ── 2. Metrics Strip ─────────────────────────────────────────────────── */}
-      <section style={{ background: "#f5f5f4", borderTop: "1px solid #e7e5e4", borderBottom: "1px solid #e7e5e4" }}>
-        <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-stone-200">
-            {[
-              { num: 4, suffix: "×", label: "faster research synthesis", sub: "3–5 days vs. 2–4 weeks" },
-              { num: 3, suffix: "×", label: "more concepts per budget", sub: "same dollar, more directions" },
-              { num: 50, suffix: "%", label: "less handoff friction", sub: "annotated specs that ship" },
-              { num: 9, suffix: " yrs", label: "product design experience", sub: "SaaS, fintech, enterprise" },
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className="px-8 py-12 text-center"
-              >
-                <div
-                  className="font-bold tracking-tight mb-2 leading-none"
-                  style={{
-                    fontSize: "clamp(2.2rem, 4vw, 3.2rem)",
-                    fontFamily: "var(--font-display)",
-                    color: "var(--terra-500)",
-                  }}
-                >
-                  <AnimatedCounter value={stat.num} suffix={stat.suffix} />
+      {(() => {
+        const METRICS = [
+          { num: 4, suffix: "×", label: "faster research synthesis", sub: "3–5 days vs. 2–4 weeks" },
+          { num: 3, suffix: "×", label: "more concepts per budget", sub: "same dollar, more directions" },
+          { num: 50, suffix: "%", label: "less handoff friction", sub: "annotated specs that ship" },
+          { num: 9, suffix: " yrs", label: "product design experience", sub: "SaaS, fintech, enterprise" },
+        ];
+
+        return (
+          <section style={{ background: "#f5f5f4", borderTop: "1px solid #e7e5e4", borderBottom: "1px solid #e7e5e4" }}>
+            {/* Desktop: 2×2 / 4-up divided grid with counter-up animation */}
+            <div className="hidden md:block">
+              <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+                <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-stone-200">
+                  {METRICS.map((stat, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                      className="px-8 py-12 text-center"
+                    >
+                      <div
+                        className="font-bold tracking-tight mb-2 leading-none"
+                        style={{
+                          fontSize: "clamp(2.2rem, 4vw, 3.2rem)",
+                          fontFamily: "var(--font-display)",
+                          color: "var(--terra-500)",
+                        }}
+                      >
+                        <AnimatedCounter value={stat.num} suffix={stat.suffix} />
+                      </div>
+                      <div className="text-[13px] font-medium mb-1 text-stone-700">{stat.label}</div>
+                      <div className="text-[12px] text-stone-500">{stat.sub}</div>
+                    </motion.div>
+                  ))}
                 </div>
-                <div className="text-[13px] font-medium mb-1 text-stone-700">{stat.label}</div>
-                <div className="text-[12px] text-stone-500">{stat.sub}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+              </div>
+            </div>
+
+            {/* Mobile: continuous marquee/ticker — ambient horizontal scroll.
+                Content duplicated so the loop is seamless when translateX
+                hits -50% (the duplicate is now in the original position). */}
+            <div className="md:hidden overflow-hidden py-10 relative">
+              {/* Soft edge masks — fade left/right to avoid hard cut-off at viewport edges */}
+              <div
+                aria-hidden
+                className="absolute inset-y-0 left-0 z-10 pointer-events-none"
+                style={{
+                  width: 40,
+                  background: "linear-gradient(to right, #f5f5f4 0%, rgba(245,245,244,0) 100%)",
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute inset-y-0 right-0 z-10 pointer-events-none"
+                style={{
+                  width: 40,
+                  background: "linear-gradient(to left, #f5f5f4 0%, rgba(245,245,244,0) 100%)",
+                }}
+              />
+
+              <div className="metrics-marquee flex gap-6" style={{ width: "max-content" }}>
+                {[...METRICS, ...METRICS].map((stat, i) => (
+                  <div
+                    key={i}
+                    className="flex-shrink-0 text-center"
+                    style={{ width: 240 }}
+                  >
+                    <div
+                      className="font-bold tracking-tight mb-2 leading-none"
+                      style={{
+                        fontSize: "2.4rem",
+                        fontFamily: "var(--font-display)",
+                        color: "var(--terra-500)",
+                      }}
+                    >
+                      {stat.num}{stat.suffix}
+                    </div>
+                    <div className="text-[14px] font-medium mb-1 text-stone-700">
+                      {stat.label}
+                    </div>
+                    <div className="text-[12px] text-stone-500">{stat.sub}</div>
+                  </div>
+                ))}
+              </div>
+
+              <style>{`
+                @keyframes metrics-marquee-anim {
+                  from { transform: translateX(0); }
+                  to   { transform: translateX(-50%); }
+                }
+                .metrics-marquee {
+                  animation: metrics-marquee-anim 32s linear infinite;
+                  will-change: transform;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                  .metrics-marquee { animation: none; }
+                }
+              `}</style>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* ── 3. Case Studies ──────────────────────────────────────────────────── */}
       <section id="work" className="py-32 relative" style={{ background: "radial-gradient(ellipse at 80% -5%, rgba(196,82,42,0.055) 0%, transparent 52%), #ffffff" }}>
@@ -825,11 +971,14 @@ export default function Homepage() {
             onMouseLeave={() => { featMX.set(0); featMY.set(0); }}
           >
 
-            {/* Image area — gradient top, image blends in from below */}
+            {/* Image area — gradient top, image blends in from below
+                Mobile uses a much larger 56vw min so the hero image is
+                truly hero-sized (was 30vw which collapsed to 96px on
+                a 320px viewport). */}
             <div
               className="relative overflow-hidden"
               style={{
-                height: "clamp(260px, 30vw, 400px)",
+                height: "clamp(240px, 56vw, 400px)",
                 background: "linear-gradient(to bottom, rgba(196,82,42,0.12) 0%, rgba(247,243,240,1) 42%, white 72%)",
               }}
             >
@@ -870,7 +1019,7 @@ export default function Homepage() {
             </div>
 
             {/* Content below */}
-            <div className="p-8 lg:p-12">
+            <div className="p-6 lg:p-12">
               <div className="flex flex-col lg:flex-row lg:gap-16 lg:items-start">
 
                 {/* Left: tags + title */}
@@ -893,15 +1042,16 @@ export default function Homepage() {
                 {/* Right: description + CTA */}
                 <div className="flex-1 mt-6 lg:mt-0 flex flex-col gap-7 justify-center">
                   <p className="text-base leading-relaxed text-stone-500">
-                    Unified 3 security platforms under one AI-assisted design system —
-                    catching accessibility issues before handoff, reducing QA cycles by 40%.
+                    An AI-native security platform that connects vulnerabilities across code,
+                    teams, and ownership — helping organisations see not just what's broken,
+                    but who owns it, why it matters, and how to act on it.
                   </p>
                   <Link
                     to={`/case-study/${featuredProject.id}`}
-                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200 text-sm font-semibold text-white self-start"
-                    style={{ background: "var(--terra-500)" }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
+                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200 text-sm font-semibold self-start"
+                    style={{ background: "var(--terra-600)", color: "#ffffff" }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
                   >
                     Read Full Case Study
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -912,78 +1062,151 @@ export default function Homepage() {
             </div>
           </motion.div>
 
-          {/* ── 2 project cards — connected cluster ── */}
+          {/* ── 2 project cards — desktop connected cluster ── */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-2xl overflow-hidden"
+            className="hidden lg:block rounded-2xl overflow-hidden"
             style={{ border: "1px solid #e7e5e4" }}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2">
-              {moreProjects.slice(0, 2).map((project, i) => {
-                const DomainIcon = PROJECT_DOMAIN_ICONS[i + 1] || Layers;
-                return (
-                  <Link
-                    key={project.id}
-                    to={`/case-study/${project.id}`}
-                    className="group cursor-pointer flex flex-col"
-                    style={{ borderLeft: i > 0 ? "1px solid #ece8e6" : undefined, textDecoration: "none" }}
-                  >
-                    {/* Image area — padded, blends into card like Key Decisions grid */}
-                    <div className="relative" style={{ height: "300px" }}>
-                      <motion.div
-                        className="absolute inset-9 bottom-6"
-                        initial={{ y: 22, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }}
-                        viewport={{ once: true, margin: "-40px" }}
-                        transition={{ duration: 0.55, delay: 0.08 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                      >
-                        <img
-                          src="/Hero Image.png"
-                          alt={project.title}
-                          className="w-full h-full object-cover object-top"
-                          style={{
-                            borderRadius: "10px 10px 0 0",
-                            filter: "drop-shadow(0 -6px 20px rgba(0,0,0,0.11))",
-                          }}
-                        />
-                      </motion.div>
-                    </div>
+              {moreProjects.slice(0, 2).map((project, i) => (
+                <Link
+                  key={project.id}
+                  to={`/case-study/${project.id}`}
+                  className="group cursor-pointer flex flex-col"
+                  style={{ borderLeft: i > 0 ? "1px solid #ece8e6" : undefined, textDecoration: "none" }}
+                >
+                  {/* Image area — padded, blends into card */}
+                  <div className="relative" style={{ height: "300px" }}>
+                    <motion.div
+                      className="absolute inset-9 bottom-6"
+                      initial={{ y: 22, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.55, delay: 0.08 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <img
+                        src="/Hero Image.png"
+                        alt={project.title}
+                        className="w-full h-full object-cover object-top"
+                        style={{
+                          borderRadius: "10px 10px 0 0",
+                          filter: "drop-shadow(0 -6px 20px rgba(0,0,0,0.11))",
+                        }}
+                      />
+                    </motion.div>
+                  </div>
 
-                    {/* Content */}
-                    <div className="px-10 pt-10 pb-12 flex flex-col gap-7 flex-1">
-                      <div className="text-[11px]">
-                        <HighlightMark delay={0.2 + i * 0.2}>{project.category}</HighlightMark>
-                      </div>
-                      <h3
-                        className="text-[16px] font-bold tracking-tight leading-snug text-stone-900"
-                        style={{ fontFamily: "var(--font-display)" }}
-                      >
-                        {project.title}
-                      </h3>
-                      <p className="text-[13px] line-clamp-2 leading-relaxed flex-1" style={{ color: "#78716c" }}>
-                        {project.description}
-                      </p>
-                      <div
-                        className="flex items-center gap-1 transition-all group-hover:gap-2 self-start"
-                        style={{ color: "var(--terra-500)" }}
-                      >
-                        <span className="text-[12px] font-medium">View case study</span>
-                        <ChevronRight className="w-3 h-3" />
-                      </div>
+                  {/* Content */}
+                  <div className="px-10 pt-10 pb-12 flex flex-col gap-7 flex-1">
+                    <div className="text-[11px]">
+                      <HighlightMark delay={0.2 + i * 0.2}>{project.category}</HighlightMark>
                     </div>
-                  </Link>
-                );
-              })}
+                    <h3
+                      className="text-[16px] font-bold tracking-tight leading-snug text-stone-900"
+                      style={{ fontFamily: "var(--font-display)" }}
+                    >
+                      {project.title}
+                    </h3>
+                    <p className="text-[13px] line-clamp-2 leading-relaxed flex-1" style={{ color: "#78716c" }}>
+                      {project.description}
+                    </p>
+                    <div
+                      className="flex items-center gap-1 transition-all group-hover:gap-2 self-start"
+                      style={{ color: "var(--terra-500)" }}
+                    >
+                      <span className="text-[12px] font-medium">View case study</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </motion.div>
+
+          {/* ── 2 project cards — mobile carousel ──
+              Swipe horizontally between secondary projects. Each card
+              has its own border (independent unit), reduced padding,
+              and a tighter image height appropriate for mobile. */}
+          <div className="lg:hidden -mx-6">
+            <MobileCarousel
+              cardWidthPercent={86}
+              gap={14}
+              snap="center"
+              ariaLabel="More case studies"
+            >
+              {moreProjects.slice(0, 2).map((project, i) => (
+                <Link
+                  key={project.id}
+                  to={`/case-study/${project.id}`}
+                  className="group flex h-full flex-col rounded-2xl overflow-hidden"
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid #e7e5e4",
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+                    textDecoration: "none",
+                  }}
+                >
+                  {/* Image area — responsive height for mobile */}
+                  <div className="relative" style={{ height: "clamp(200px, 48vw, 260px)" }}>
+                    <motion.div
+                      className="absolute"
+                      style={{ inset: 22, bottom: 14 }}
+                      initial={{ y: 16, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.5, delay: 0.06 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <img
+                        src="/Hero Image.png"
+                        alt={project.title}
+                        className="w-full h-full object-cover object-top"
+                        style={{
+                          borderRadius: "10px 10px 0 0",
+                          filter: "drop-shadow(0 -4px 14px rgba(0,0,0,0.10))",
+                        }}
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* Content — reduced mobile padding */}
+                  <div className="px-6 pt-6 pb-7 flex flex-col gap-5 flex-1">
+                    <div className="text-[12px]">
+                      <HighlightMark delay={0.2 + i * 0.2}>{project.category}</HighlightMark>
+                    </div>
+                    <h3
+                      className="text-[17px] font-bold tracking-tight leading-snug text-stone-900"
+                      style={{ fontFamily: "var(--font-display)" }}
+                    >
+                      {project.title}
+                    </h3>
+                    <p
+                      className="text-[14px] line-clamp-3 leading-relaxed flex-1"
+                      style={{ color: "#78716c" }}
+                    >
+                      {project.description}
+                    </p>
+                    <div
+                      className="flex items-center gap-1.5 self-start"
+                      style={{ color: "var(--terra-500)" }}
+                    >
+                      <span className="text-[13px] font-medium">View case study</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </MobileCarousel>
+          </div>
         </div>
       </section>
 
       {/* ── 4. Testimonials ──────────────────────────────────────────────────── */}
       <section
+        id="clients"
         className="py-28 relative"
         style={{ background: "#f5f5f4", borderTop: "1px solid #e7e5e4" }}
       >
@@ -1028,7 +1251,9 @@ export default function Homepage() {
             </div>
           </motion.div>
 
-          {/* World Map */}
+          {/* World Map — stays within content padding (no edge-to-edge
+              bleed on mobile). Because the SVG aspect ratio is preserved,
+              keeping it inside the container also keeps the height modest. */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1039,9 +1264,9 @@ export default function Homepage() {
             <WorldMap activeIndex={activeTestimonial} />
           </motion.div>
 
-          {/* Testimonial cards — click to activate */}
+          {/* Desktop: 3-up grid with click-to-activate */}
           <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-4"
+            className="hidden md:grid grid-cols-3 gap-4"
             onMouseEnter={() => setPauseAutoRotate(true)}
             onMouseLeave={() => setPauseAutoRotate(false)}
           >
@@ -1105,6 +1330,93 @@ export default function Homepage() {
             })}
           </div>
 
+          {/* Mobile: swipe carousel — drives the world-map active marker
+              via onActiveChange. Centered card has full "active" treatment,
+              siblings dim back to the inactive visual style (matches the
+              desktop active/inactive pattern). */}
+          <div className="md:hidden -mx-6">
+            <MobileCarousel
+              cardWidthPercent={84}
+              gap={14}
+              snap="center"
+              initialIndex={activeTestimonial}
+              onActiveChange={(idx) => setActiveTestimonial(idx)}
+              ariaLabel="Client testimonials"
+            >
+              {TESTIMONIALS.map((t, i) => {
+                const isActive = i === activeTestimonial;
+                return (
+                  <div
+                    key={t.name}
+                    className="h-full p-7 rounded-2xl flex flex-col gap-4 transition-all duration-300"
+                    style={{
+                      background: isActive ? "#ffffff" : "rgba(255,255,255,0.5)",
+                      border: isActive ? "1px solid #d6d3d1" : "1px solid #e7e5e4",
+                      boxShadow: isActive ? "0 4px 20px rgba(0,0,0,0.07)" : "none",
+                    }}
+                  >
+                    {/* Quote mark */}
+                    <div
+                      className="text-4xl font-bold leading-none select-none"
+                      style={{
+                        color: isActive ? "var(--terra-400)" : "var(--terra-light)",
+                        fontFamily: "var(--font-display)",
+                        lineHeight: 0.9,
+                      }}
+                    >
+                      {'“'}
+                    </div>
+
+                    {/* Quote */}
+                    <p className="text-[14px] leading-relaxed flex-1 text-stone-600 -mt-1">
+                      {t.quote}
+                    </p>
+
+                    {/* Stars */}
+                    <div className="flex gap-0.5">
+                      {[...Array(t.rating)].map((_, j) => (
+                        <Star
+                          key={j}
+                          className="w-3 h-3"
+                          fill={isActive ? "var(--terra-500)" : "#d6d3d1"}
+                          style={{ color: isActive ? "var(--terra-500)" : "#d6d3d1" }}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Attribution */}
+                    <div
+                      className="flex items-center gap-3 pt-3"
+                      style={{ borderTop: `1px solid ${isActive ? "#e7e5e4" : "#ece9e6"}` }}
+                    >
+                      <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0"
+                        style={{
+                          background: isActive ? "var(--terra-light)" : "#ece9e6",
+                          border: `1px solid ${isActive ? "var(--terra-border)" : "#e2ded9"}`,
+                          color: isActive ? "var(--terra-500)" : "#78716c",
+                          fontFamily: "var(--font-display)",
+                        }}
+                      >
+                        {t.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="text-[14px] font-semibold text-stone-800">{t.name}</div>
+                        <div className="text-[12px] text-stone-500">{t.role} · {t.company}</div>
+                        <div
+                          className="text-[12px] mt-0.5"
+                          style={{ color: isActive ? "var(--terra-500)" : "#78716c" }}
+                        >
+                          {t.location}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </MobileCarousel>
+          </div>
+
           {/* Upwork CTA */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -1134,12 +1446,12 @@ export default function Homepage() {
       </section>
 
       {/* ── 5. How I Work ────────────────────────────────────────────────────── */}
-      <IcebergSection />
+      <section id="process">
+        <IcebergSection />
+      </section>
 
       {/* ── 6. Services ──────────────────────────────────────────────────────── */}
-      <section id="services" style={{ background: "#f5f5f4", borderTop: "1px solid #e7e5e4" }}>
-        <WhoItsFor />
-      </section>
+      <WhoItsFor />
 
       {/* ── 7. About ──────────────────────────────────────────────────────────── */}
       <section
@@ -1211,33 +1523,61 @@ export default function Homepage() {
               className="lg:col-span-2 space-y-4"
             >
               {/* Industries card */}
-              <div
-                className="p-7 rounded-2xl"
-                style={{ background: "#f5f5f4", border: "1px solid #e7e5e4" }}
-              >
-                <h3
-                  className="text-[13px] font-semibold mb-5 flex items-center gap-2 text-stone-700"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  <TrendingUp className="w-4 h-4" style={{ color: "var(--terra-500)" }} />
-                  Industries Served
-                </h3>
-                <ul className="space-y-2.5">
-                  {[
-                    "SaaS & Productivity Tools",
-                    "FinTech & Financial Services",
-                    "HealthTech & Wellness",
-                    "Enterprise Software",
-                    "Consumer Mobile Apps",
-                    "AI & Data Products",
-                  ].map((ind) => (
-                    <li key={ind} className="flex items-center gap-2.5 text-[13px] text-stone-500">
-                      <span style={{ color: "var(--terra-500)" }}>→</span>
-                      {ind}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {(() => {
+                const INDUSTRIES = [
+                  "SaaS & Productivity Tools",
+                  "FinTech & Financial Services",
+                  "HealthTech & Wellness",
+                  "Enterprise Software",
+                  "Consumer Mobile Apps",
+                  "AI & Data Products",
+                ];
+                return (
+                  <div
+                    className="p-7 rounded-2xl"
+                    style={{ background: "#f5f5f4", border: "1px solid #e7e5e4" }}
+                  >
+                    <h3
+                      className="text-[13px] font-semibold mb-5 flex items-center gap-2 text-stone-700"
+                      style={{ fontFamily: "var(--font-display)" }}
+                    >
+                      <TrendingUp className="w-4 h-4" style={{ color: "var(--terra-500)" }} />
+                      Industries Served
+                    </h3>
+
+                    {/* Desktop: vertical list with arrow bullets */}
+                    <ul className="hidden md:block space-y-2.5">
+                      {INDUSTRIES.map((ind) => (
+                        <li key={ind} className="flex items-center gap-2.5 text-[13px] text-stone-500">
+                          <span style={{ color: "var(--terra-500)" }}>→</span>
+                          {ind}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Mobile: chip cluster wraps onto multiple rows.
+                        Each industry is a pill, the cluster flows in 2–3
+                        rows depending on viewport width. No scrolling,
+                        every industry visible at a glance. */}
+                    <div className="md:hidden flex flex-wrap gap-2">
+                      {INDUSTRIES.map((ind) => (
+                        <span
+                          key={ind}
+                          className="inline-flex items-center text-[13px] font-medium px-3.5 py-2 rounded-full"
+                          style={{
+                            background: "#ffffff",
+                            border: "1px solid #e2ded9",
+                            color: "#57534e",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {ind}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Availability card */}
               <div
@@ -1315,10 +1655,10 @@ export default function Homepage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href="mailto:sreeharsha@alvyl.com"
-                  className="group px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-semibold text-white"
-                  style={{ background: "var(--terra-500)" }}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
+                  className="group px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all duration-200 text-sm font-semibold"
+                  style={{ background: "var(--terra-600)", color: "#ffffff" }}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-500)"}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--terra-600)"}
                 >
                   Start a Conversation
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -1327,10 +1667,20 @@ export default function Homepage() {
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-4 rounded-xl inline-flex items-center justify-center transition-all duration-200 text-sm font-medium"
-                  style={{ border: "1px solid #e7e5e4", color: "#57534e", background: "#ffffff" }}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = "#1c1917"}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = "#e7e5e4"}
+                  className="px-8 py-4 rounded-xl inline-flex items-center justify-center transition-all duration-200 text-sm font-semibold"
+                  style={{
+                    border: "1px solid rgba(217,119,6,0.30)",
+                    color: "var(--terra-500)",
+                    background: "rgba(217,119,6,0.05)",
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(217,119,6,0.50)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(217,119,6,0.10)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(217,119,6,0.30)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(217,119,6,0.05)";
+                  }}
                 >
                   Connect on LinkedIn
                 </a>
@@ -1338,8 +1688,8 @@ export default function Homepage() {
             </div>
 
             {/* Process steps — icons replace numbers */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
+            {(() => {
+              const PROCESS_STEPS = [
                 {
                   icon: MessageSquare,
                   title: "Send a message",
@@ -1355,32 +1705,124 @@ export default function Homepage() {
                   title: "Proposal in 48 hours",
                   description: "A clear scope, timeline, and pricing proposal. No vague estimates, no surprise fees.",
                 },
-              ].map((item, index) => (
+              ];
+
+              const StepCard = ({
+                step,
+                index,
+              }: {
+                step: typeof PROCESS_STEPS[number];
+                index: number;
+              }) => (
                 <motion.div
-                  key={item.title}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl"
+                  className="h-full p-6 rounded-2xl"
                   style={{ background: "#ffffff", border: "1px solid #e7e5e4" }}
                 >
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
                     style={{ background: "var(--terra-light)", border: "1px solid var(--terra-border)" }}
                   >
-                    <item.icon className="w-4.5 h-4.5" style={{ color: "var(--terra-500)" }} />
+                    <step.icon className="w-4.5 h-4.5" style={{ color: "var(--terra-500)" }} />
                   </div>
                   <h4
                     className="font-semibold mb-2 text-stone-800"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
-                    {item.title}
+                    {step.title}
                   </h4>
-                  <p className="text-[14px] leading-relaxed text-stone-500">{item.description}</p>
+                  <p className="text-[14px] leading-relaxed text-stone-500">{step.description}</p>
                 </motion.div>
-              ))}
-            </div>
+              );
+
+              return (
+                <>
+                  {/* Desktop: 3-up grid */}
+                  <div className="hidden md:grid grid-cols-3 gap-4">
+                    {PROCESS_STEPS.map((step, i) => (
+                      <StepCard key={step.title} step={step} index={i} />
+                    ))}
+                  </div>
+
+                  {/* Mobile: vertical numbered stepper with connecting line.
+                      Numbered circles in terra, vertical line connects 1→2→3
+                      showing the sequential flow naturally. */}
+                  <div className="md:hidden relative">
+                    {/* Continuous vertical line spanning step 1 → step 3 */}
+                    <div
+                      aria-hidden
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: 19, // centred under the 40px wide circles (40/2=20, offset -1 for line width)
+                        top: 40,
+                        bottom: 40,
+                        width: 2,
+                        background: "linear-gradient(to bottom, var(--terra-light), #e7e5e4, var(--terra-light))",
+                        opacity: 0.7,
+                      }}
+                    />
+
+                    <div className="flex flex-col gap-7">
+                      {PROCESS_STEPS.map((step, i) => (
+                        <motion.div
+                          key={step.title}
+                          initial={{ opacity: 0, y: 14 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: "-40px" }}
+                          transition={{
+                            duration: 0.45,
+                            delay: i * 0.1,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                          className="relative flex items-start gap-4"
+                        >
+                          {/* Icon circle — subtle terra-tinted fill with
+                              a brand-colored icon. Softer than a solid
+                              terra fill; reads as a quiet anchor for each
+                              step rather than a loud marker. */}
+                          <div
+                            className="flex-shrink-0 flex items-center justify-center rounded-full"
+                            style={{
+                              width: 40,
+                              height: 40,
+                              background: "var(--terra-light)",
+                              border: "1px solid var(--terra-border)",
+                              color: "var(--terra-500)",
+                              boxShadow: "0 0 0 4px #f5f5f4",
+                              // Inset 4px shadow uses the section bg color to
+                              // visually "break" the connecting line at each
+                              // circle so the line stops cleanly behind it.
+                              position: "relative",
+                              zIndex: 1,
+                            }}
+                          >
+                            <step.icon className="w-[18px] h-[18px]" />
+                          </div>
+
+                          {/* Content (right of circle) — title only, no inline icon */}
+                          <div className="flex-1 pt-0.5 pb-1">
+                            <div className="mb-1.5">
+                              <h4
+                                className="text-[15px] font-semibold text-stone-800"
+                                style={{ fontFamily: "var(--font-display)" }}
+                              >
+                                {step.title}
+                              </h4>
+                            </div>
+                            <p className="text-[14px] leading-relaxed text-stone-500">
+                              {step.description}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
           </motion.div>
         </div>
       </section>
