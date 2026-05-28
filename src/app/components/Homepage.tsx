@@ -785,20 +785,6 @@ export default function Homepage() {
             </a>
           </motion.div>
 
-          {/* Proof strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.85, duration: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm"
-            style={{ color: "#78716c" }}
-          >
-            <span>9 years experience</span>
-            <span className="hidden sm:block" style={{ color: "#e7e5e4" }}>·</span>
-            <span>Startups to enterprise</span>
-            <span className="hidden sm:block" style={{ color: "#e7e5e4" }}>·</span>
-            <span>Available for new projects</span>
-          </motion.div>
         </div>
 
       </section>
@@ -995,27 +981,6 @@ export default function Homepage() {
                 />
               </div>
 
-              {/* Floating metric chip */}
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute bottom-6 left-8 z-10"
-              >
-                <motion.div
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 3.2, ease: "easeInOut", repeat: Infinity }}
-                  className="px-4 py-2.5 rounded-xl flex items-center gap-3"
-                  style={{ background: "#ffffff", border: "1px solid #e7e5e4", boxShadow: "0 4px 16px rgba(0,0,0,0.10)" }}
-                >
-                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--terra-500)" }} />
-                  <div>
-                    <div className="text-[12px] font-bold" style={{ color: "var(--terra-500)" }}>40% fewer QA cycles</div>
-                    <div className="text-[12px] text-stone-500">AI-caught before handoff</div>
-                  </div>
-                </motion.div>
-              </motion.div>
             </div>
 
             {/* Content below */}
@@ -1308,17 +1273,6 @@ export default function Homepage() {
 
                   {/* Attribution */}
                   <div className="flex items-center gap-3 pt-3" style={{ borderTop: `1px solid ${isActive ? "#e7e5e4" : "#ece9e6"}` }}>
-                    <div
-                      className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0"
-                      style={{
-                        background: isActive ? "var(--terra-light)" : "#ece9e6",
-                        border: `1px solid ${isActive ? "var(--terra-border)" : "#e2ded9"}`,
-                        color: isActive ? "var(--terra-500)" : "#78716c",
-                        fontFamily: "var(--font-display)",
-                      }}
-                    >
-                      {t.name.charAt(0)}
-                    </div>
                     <div>
                       <div className="text-[14px] font-semibold text-stone-800">{t.name}</div>
                       <div className="text-[12px] text-stone-500">{t.role} · {t.company}</div>
@@ -1389,17 +1343,6 @@ export default function Homepage() {
                       className="flex items-center gap-3 pt-3"
                       style={{ borderTop: `1px solid ${isActive ? "#e7e5e4" : "#ece9e6"}` }}
                     >
-                      <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0"
-                        style={{
-                          background: isActive ? "var(--terra-light)" : "#ece9e6",
-                          border: `1px solid ${isActive ? "var(--terra-border)" : "#e2ded9"}`,
-                          color: isActive ? "var(--terra-500)" : "#78716c",
-                          fontFamily: "var(--font-display)",
-                        }}
-                      >
-                        {t.name.charAt(0)}
-                      </div>
                       <div>
                         <div className="text-[14px] font-semibold text-stone-800">{t.name}</div>
                         <div className="text-[12px] text-stone-500">{t.role} · {t.company}</div>
@@ -1423,7 +1366,7 @@ export default function Homepage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-5 flex items-center justify-between p-5 rounded-2xl"
+            className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between p-5 rounded-2xl"
             style={{ background: "#ffffff", border: "1px solid #e7e5e4" }}
           >
             <p className="text-[14px] text-stone-500">
@@ -1433,7 +1376,7 @@ export default function Homepage() {
               href="https://upwork.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200"
+              className="self-start inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200"
               style={{ border: "1px solid #e7e5e4", color: "#57534e" }}
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = "#1c1917"}
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = "#e7e5e4"}

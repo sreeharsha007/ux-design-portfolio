@@ -8,6 +8,11 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Remove tap highlight circle on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Scrollbar */
 body::-webkit-scrollbar { width: 8px; }
 body::-webkit-scrollbar-track { background: var(--surface); }

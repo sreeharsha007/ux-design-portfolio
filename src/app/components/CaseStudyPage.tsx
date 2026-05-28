@@ -277,7 +277,7 @@ export default function CaseStudyPage() {
     );
   }
 
-  const { title, category, role, timeline, industry, tagline, context, contextPoints, keyDecisions, impactItems, projectAssets, aiDesignNote, nextPhase, reflection } = project;
+  const { title, category, role, timeline, industry, tagline, heroImage, contextImage, context, contextPoints, keyDecisions, impactItems, projectAssets, aiDesignNote, nextPhase, reflection } = project;
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "var(--font-body, system-ui)" }}>
@@ -357,7 +357,7 @@ export default function CaseStudyPage() {
             >
               {/* MOBILE — natural-aspect image */}
               <img
-                src="/Featured Project Hero Image.png"
+                src={heroImage ?? "/Featured Project Hero Image.png"}
                 alt={title}
                 className="block lg:hidden w-full h-auto"
               />
@@ -372,7 +372,7 @@ export default function CaseStudyPage() {
                   className="absolute w-full h-[calc(100%+140px)] top-0"
                 >
                   <img
-                    src="/Featured Project Hero Image.png"
+                    src={heroImage ?? "/Featured Project Hero Image.png"}
                     alt={title}
                     className="w-full h-full object-cover"
                     style={{ objectPosition: "center top" }}
@@ -434,7 +434,7 @@ export default function CaseStudyPage() {
                 className="relative lg:sticky lg:top-28"
               >
                 <img
-                  src="/Featured Project Challenges.png"
+                  src={contextImage ?? "/Featured Project Challenges.png"}
                   alt="Fragmented organizational context"
                   className="w-full h-auto"
                   style={{ filter: "drop-shadow(0 8px 32px rgba(0,0,0,0.10))" }}
@@ -488,7 +488,7 @@ export default function CaseStudyPage() {
                     >
                       <div className="absolute inset-x-0 bottom-0" style={{ height: "100%" }}>
                         <motion.img
-                          src="/WID 1.png"
+                          src={keyDecisions[0].image ?? "/WID 1.png"}
                           alt={keyDecisions[0].title}
                           initial={{ scale: 1.05, opacity: 0 }}
                           whileInView={{ scale: 1.0, opacity: 1 }}
@@ -568,7 +568,7 @@ export default function CaseStudyPage() {
                             style={{ borderRadius: "10px 10px 0 0" }}
                           >
                             <img
-                              src={i === 0 ? "/Final Deep Navigation.png" : i === 1 ? "/Final Collaboration.png" : i === 2 ? "/Final Principles.png" : "/Final Design System.png"}
+                              src={keyDecisions[i + 1]?.image ?? (i === 0 ? "/Final Deep Navigation.png" : i === 1 ? "/Final Collaboration.png" : i === 2 ? "/Final Principles.png" : "/Final Design System.png")}
                               alt={decision.title}
                               className="w-full h-full object-contain object-bottom"
                               style={{
@@ -633,10 +633,11 @@ export default function CaseStudyPage() {
                     const meta = DECISION_META[i + 1] ?? DECISION_META[0];
                     const { Icon } = meta;
                     const imgSrc =
-                      i === 0 ? "/Final Deep Navigation.png" :
-                      i === 1 ? "/Final Collaboration.png" :
-                      i === 2 ? "/Final Principles.png" :
-                                "/Final Design System.png";
+                      decision.image ??
+                      (i === 0 ? "/Final Deep Navigation.png" :
+                       i === 1 ? "/Final Collaboration.png" :
+                       i === 2 ? "/Final Principles.png" :
+                                 "/Final Design System.png");
                     return (
                       <div
                         key={i}

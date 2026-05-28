@@ -20,6 +20,7 @@ export interface KeyDecision {
   description: string;
   rationale?: string;
   artefacts?: string[];
+  image?: string;
 }
 
 export interface ImpactItem {
@@ -61,6 +62,7 @@ export interface Project {
   processTimeline: ProcessTimelineStep[];
   tagline?: string;
   heroImage?: string;
+  contextImage?: string;
   context?: string;
   contextPoints?: ContextPoint[];
   keyDecisions?: KeyDecision[];
@@ -195,9 +197,9 @@ export const projects: Project[] = [
   },
   {
     id: "neural-insights",
-    title: "AI Analytics Dashboard",
+    title: "Pipeline operations were information-rich, but not decision-friendly.",
     category: "Data Visualization",
-    description: "A real-time analytics platform that translates complex ML model performance data into clear, actionable business insights — designed specifically for non-technical stakeholders who need to make fast decisions.",
+    description: "I helped shape a modern operational platform that made complex pipeline workflows across design, monitoring, and diagnostics more visual, usable, and actionable — without losing the rigor required in industrial environments.",
     image: "https://images.unsplash.com/photo-1752253604157-65fb42c30816?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsJTIwZnV0dXJpc3RpYyUyMGludGVyZmFjZSUyMGRlc2lnbnxlbnwxfHx8fDE3NzIxMDUxNjF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     role: "Head of UX Design",
     timeline: "6 months (2025)",
@@ -263,25 +265,27 @@ export const projects: Project[] = [
         description: "Final handoff with annotated specs, edge case documentation, and a live walkthrough with the engineering team"
       }
     ],
-    tagline: "Analytics that speak business, not model telemetry.",
-    context: "Business leaders at a 250-person enterprise were expected to make decisions from an AI analytics dashboard built for data engineers. Every exec-level question became a ticket to the data team. Trust in the product was eroding — not because the data was wrong, but because no one at the top could read it.",
+    tagline: "I helped shape a modern operational platform that made complex pipeline workflows across design, monitoring, and diagnostics more visual, usable, and actionable — without losing the rigor required in industrial environments.",
+    heroImage: "/Pipeline - Hero Image, Key Decision 5.png",
+    contextImage: "/Pipeline - Context and Problems.png",
+    context: "Pipeline operations sit across interconnected infrastructure, legacy operational systems, and safety-critical workflows. Teams need to design, monitor, and diagnose complex networks of pipelines, valves, tanks, pumps, and control systems — often within environments where clarity, speed, and trust matter as much as functionality. While the tools in this space were operationally powerful, they were often dense, engineering-heavy, and not naturally aligned with modern product workflows. The opportunity was not just to modernize the interface, but to make complex operational systems easier to understand, work through, and act on without compromising domain rigor.",
     contextPoints: [
-      { title: "Wrong audience, wrong UI", description: "The dashboard exposed raw ML metrics — precision, recall, drift — to VPs who needed to know 'is this working for the business?'" },
-      { title: "Escalation overhead", description: "The data team handled 40+ basic questions per week from leadership, slowing their roadmap." },
-      { title: "Decisions delayed by days", description: "Leaders waited 3–4 days for the data team to produce interpretable answers before acting." },
+      { title: "Operational complexity was hard to interpret", description: "Infrastructure relationships, component dependencies, and system behavior were visible, but not always easy to read as one connected operational picture." },
+      { title: "Design, monitoring, and diagnostics felt disconnected", description: "Users had to think across multiple operational modes, but the experience did not naturally unify system creation, live visibility, and issue analysis into one coherent workflow." },
+      { title: "Usability had to improve without breaking operational trust", description: "Any modernization had to work within the expectations of industrial and SCADA-like environments, where readability, control, and confidence mattered more than visual novelty." },
     ],
     keyDecisions: [
-      { title: "Role-adaptive views", description: "One product, three density levels — exec, analyst, engineer — each rendered from the same data layer.", rationale: "A single dashboard cannot serve three audiences. Progressive disclosure was the only scalable answer.", artefacts: ["View matrix", "Density audit"] },
-      { title: "Translate metrics into money and risk", description: "Every technical metric gets a plain-language business equivalent alongside it.", rationale: "Execs act on revenue and risk language, not F1 scores. Teaching vocabulary at scale is slower than translating it.", artefacts: ["Metric translation map", "Exec lexicon"] },
-      { title: "Tooltips that teach, not define", description: "Hover states explain why a metric matters, not just what it is.", rationale: "Definitions are forgettable. Context sticks.", artefacts: ["Tooltip voice guide", "Learning patterns"] },
-      { title: "Same data layer, different surfaces", description: "All three views render from one data contract — no backfills, no forked queries, no drift between roles.", rationale: "Divergent views are the fastest way to break trust. Keep the numbers singular.", artefacts: ["Data contract", "Query catalogue"] },
-      { title: "Anomaly first, history second", description: "The exec home page opens on whatever has moved the most, not on last week's scorecard.", rationale: "Time-on-dashboard is not a goal. Noticing what's different is.", artefacts: ["Anomaly ranker", "Home hierarchy"] },
+      { title: "Framing the product around operational workflows, not isolated screens", description: "Reframed the platform around connected workflows such as design, monitoring, and diagnostics, creating a more coherent operational system instead of a set of disconnected industrial views.", rationale: "PRODUCT STRUCTURE", artefacts: ["Workflow architecture", "Journey mapping", "Operational mode mapping"], image: "/Pipeline - Key Decisions 1.png" },
+      { title: "Making pipeline design feel visual, precise, and usable", description: "Defined a canvas-first builder with domain-specific components and structured interaction logic, making pipeline creation clearer, more deliberate, and easier to work through.", rationale: "WORKFLOW DESIGN", artefacts: ["Canvas workflow design", "Component behavior mapping", "Interaction prototyping"] },
+      { title: "Building a modern design foundation without losing operational credibility", description: "Created a scalable design foundation across reusable UI patterns and SCADA-aware component representations, helping the product feel more modern, consistent, and trustworthy in a high-stakes operational environment.", rationale: "DESIGN FOUNDATION", artefacts: ["Component library", "SCADA-aware component representations", "Visual system exploration", "Hierarchy and state logic"], image: "/Pipeline - Key Decision 3.png" },
+      { title: "Turning pipeline monitoring into an actionable diagnostic experience", description: "Designed the viewer experience to move beyond passive monitoring by connecting live pipeline states, component-level signals, and diagnostic details into a clearer workflow for identifying issues and acting faster.", rationale: "MONITORING & DIAGNOSIS", artefacts: ["Monitoring workflow mapping", "Diagnostic state design", "Component details interaction", "Alert hierarchy"], image: "/Pipeline - Key Decision 4.png" },
+      { title: "Positioning AI as practical workflow support", description: "Positioned AI as an assistive layer for diagnostics, recommendations, and workflow support, helping the platform feel more intelligent and useful without becoming distracting or speculative.", rationale: "AI WORKFLOW SUPPORT", artefacts: ["AI workflow exploration", "Use-case framing", "Assistive interaction patterns"], image: "/Pipeline - Hero Image, Key Decision 5.png" },
     ],
     impactItems: [
-      { title: "85% of non-technical users read correctly", detail: "Measured in moderated usability testing" },
-      { title: "60% fewer support tickets", detail: "Within 8 weeks of launch" },
-      { title: "3× weekly active usage in leadership", detail: "Compared to the previous dashboard" },
-      { title: "Same-day average time to decision", detail: "Down from 4 days pre-launch" },
+      { title: "Product direction became clearer", detail: "Workflow framing and prioritization turned a broad industrial concept into a more coherent platform direction." },
+      { title: "Operational complexity became more usable", detail: "The builder and interaction model made pipeline workflows easier to create, read, and work through." },
+      { title: "Modernization became more credible", detail: "A stronger visual and component system improved clarity and consistency without losing operational trust." },
+      { title: "The platform became more scalable", detail: "Reusable foundations and a clearer role for AI created a stronger base for future product growth." },
     ],
     aiInProject: {
       summary: "AI compressed the research and content phases from weeks to days — freeing design time for the parts that needed human judgement.",
