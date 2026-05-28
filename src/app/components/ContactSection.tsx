@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  Send, Calendar, X, ChevronLeft, ChevronRight,
+  Send, Calendar, ChevronLeft, ChevronRight,
   MessageSquare, Video, FileText, CheckCircle2, Clock, Sun, Moon,
 } from "lucide-react";
 
@@ -129,22 +129,26 @@ function WeekPicker({
   const nextMonthLabel = new Date(lastDay.getFullYear(), lastDay.getMonth() + 1, 1)
     .toLocaleString("default", { month: "short" });
   const weekLabel = firstDay.getMonth() === lastDay.getMonth()
-    ? firstDay.toLocaleString("default", { month: "long", year: "numeric" })
-    : `${firstDay.toLocaleString("default", { month: "short" })} – ${lastDay.toLocaleString("default", { month: "short", year: "numeric" })}`;
+    ? `${firstDay.toLocaleString("default", { month: "short" })} ${firstDay.getDate()}–${lastDay.getDate()}, ${lastDay.getFullYear()}`
+    : `${firstDay.toLocaleString("default", { month: "short" })} ${firstDay.getDate()} – ${lastDay.toLocaleString("default", { month: "short" })} ${lastDay.getDate()}, ${lastDay.getFullYear()}`;
 
   return (
     <div className="rounded-xl p-3" style={{ background: "#faf9f8", border: "1px solid #e7e5e4" }}>
 
       {/* Navigation row */}
       <div className="flex items-center justify-between mb-2.5">
+
+        {/* Month-jump back */}
+        <button
+          type="button"
+          onClick={() => onWeekChange(jumpToMonth(weekStart, -1))}
+          className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
+        >
+          <ChevronLeft className="w-3 h-3" />{prevMonthLabel}
+        </button>
+
+        {/* Centre: ‹week  label  week› */}
         <div className="flex items-center gap-0.5">
-          <button
-            type="button"
-            onClick={() => onWeekChange(jumpToMonth(weekStart, -1))}
-            className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
-          >
-            <ChevronLeft className="w-3 h-3" />{prevMonthLabel}
-          </button>
           <button
             type="button"
             onClick={() => onWeekChange(addDays(weekStart, -7))}
@@ -152,11 +156,9 @@ function WeekPicker({
           >
             <ChevronLeft className="w-3.5 h-3.5 text-stone-500" />
           </button>
-        </div>
-
-        <span className="text-[12px] font-semibold text-stone-600">{weekLabel}</span>
-
-        <div className="flex items-center gap-0.5">
+          <span className="text-[12px] font-semibold text-stone-600 px-1 tabular-nums whitespace-nowrap">
+            {weekLabel}
+          </span>
           <button
             type="button"
             onClick={() => onWeekChange(addDays(weekStart, 7))}
@@ -164,14 +166,16 @@ function WeekPicker({
           >
             <ChevronRight className="w-3.5 h-3.5 text-stone-500" />
           </button>
-          <button
-            type="button"
-            onClick={() => onWeekChange(jumpToMonth(weekStart, 1))}
-            className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
-          >
-            {nextMonthLabel}<ChevronRight className="w-3 h-3" />
-          </button>
         </div>
+
+        {/* Month-jump forward */}
+        <button
+          type="button"
+          onClick={() => onWeekChange(jumpToMonth(weekStart, 1))}
+          className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
+        >
+          {nextMonthLabel}<ChevronRight className="w-3 h-3" />
+        </button>
       </div>
 
       {/* Day-of-week headers */}
@@ -182,7 +186,7 @@ function WeekPicker({
       </div>
 
       {/* Day cells — single row */}
-      <div className="grid grid-cols-7 gap-0.5">
+      <div className="grid grid-cols-7">
         {days.map(day => {
           const key       = dateKey(day);
           const available = availDates.has(key) && day >= today;
@@ -190,29 +194,34 @@ function WeekPicker({
           const isToday   = key === todayKey;
 
           return (
-            <button
-              key={key}
-              type="button"
-              disabled={!available}
-              onClick={() => onDateSelect(picked ? null : key)}
-              className="aspect-square flex items-center justify-center rounded-xl text-[13px] font-medium transition-all duration-150"
-              style={{
-                background: picked ? "var(--terra-500)" : "transparent",
-                border: isToday && !picked ? "1px solid #d4ccc8" : "1px solid transparent",
-                color: picked ? "#ffffff" : available ? "#1c1917" : "#d4ccc8",
-                cursor: available ? "pointer" : "default",
-              }}
-              onMouseEnter={e => {
-                if (available && !picked)
-                  (e.currentTarget as HTMLElement).style.background = "var(--terra-light)";
-              }}
-              onMouseLeave={e => {
-                if (!picked)
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
-              }}
-            >
-              {day.getDate()}
-            </button>
+            <div key={key} className="flex items-center justify-center py-0.5">
+              <button
+                type="button"
+                disabled={!available}
+                onClick={() => onDateSelect(picked ? null : key)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-semibold transition-all duration-150"
+                style={{
+                  background: picked ? "var(--terra-light)" : "transparent",
+                  border: picked
+                    ? "1px solid var(--terra-border)"
+                    : isToday
+                    ? "1px solid #d4ccc8"
+                    : "1px solid transparent",
+                  color: picked ? "var(--terra-600)" : available ? "#1c1917" : "#d4ccc8",
+                  cursor: available ? "pointer" : "default",
+                }}
+                onMouseEnter={e => {
+                  if (available && !picked)
+                    (e.currentTarget as HTMLElement).style.background = "var(--terra-light)";
+                }}
+                onMouseLeave={e => {
+                  if (!picked)
+                    (e.currentTarget as HTMLElement).style.background = "transparent";
+                }}
+              >
+                {day.getDate()}
+              </button>
+            </div>
           );
         })}
       </div>
@@ -226,39 +235,26 @@ function SlotChip({
   slot,
   selected,
   onClick,
-  onClear,
 }: {
   slot: Slot;
   selected: boolean;
   onClick: () => void;
-  onClear?: () => void;
 }) {
   if (selected) {
-    // Selected: non-interactive pill with X inside
+    // Selected: subtle pill — no clear button, Edit sits alongside in the parent
     return (
       <div
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-semibold"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold"
         style={{
-          background: "var(--terra-500)",
-          border: "1px solid var(--terra-500)",
-          color: "#ffffff",
-          boxShadow: "0 2px 8px rgba(217,119,6,0.25)",
+          background: "var(--terra-light)",
+          border: "1px solid var(--terra-border)",
+          color: "var(--terra-600)",
         }}
       >
-        <Clock className="w-3 h-3 flex-shrink-0" />
+        <Clock className="w-3 h-3 flex-shrink-0" style={{ color: "var(--terra-500)" }} />
         <span>{slot.label}</span>
-        <span style={{ opacity: 0.75 }}>·</span>
+        <span style={{ opacity: 0.4 }}>·</span>
         <span>{slot.time}</span>
-        {onClear && (
-          <button
-            type="button"
-            onClick={onClear}
-            title="Clear selection"
-            className="ml-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-colors hover:bg-white/25"
-          >
-            <X className="w-2.5 h-2.5" />
-          </button>
-        )}
       </div>
     );
   }
@@ -611,11 +607,14 @@ export default function ContactSection() {
                             if (!next) { setSelectedSlot(null); setSelectedDate(null); }
                           }}
                           className="relative flex-shrink-0 w-9 h-5 rounded-full transition-colors duration-200"
-                          style={{ background: scheduleOn ? "var(--terra-500)" : "#d4ccc8" }}
+                          style={{ background: scheduleOn ? "rgba(217,119,6,0.14)" : "#e2ddd9" }}
                         >
                           <span
-                            className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 block"
-                            style={{ transform: scheduleOn ? "translateX(20px)" : "translateX(2px)" }}
+                            className="absolute top-0.5 w-4 h-4 rounded-full shadow-sm transition-all duration-200 block"
+                            style={{
+                              background: scheduleOn ? "var(--terra-500)" : "#ffffff",
+                              transform: scheduleOn ? "translateX(18px)" : "translateX(2px)",
+                            }}
                           />
                         </button>
                       </div>
@@ -630,22 +629,20 @@ export default function ContactSection() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -4 }}
                             transition={{ duration: 0.2, ease }}
-                            className="mt-3"
+                            className="mt-3 flex items-center gap-2.5"
                           >
                             <SlotChip
                               slot={selectedSlot}
                               selected
                               onClick={() => {}}
-                              onClear={() => { setSelectedSlot(null); }}
                             />
                             <button
                               type="button"
                               onClick={() => setSelectedSlot(null)}
-                              className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold transition-opacity hover:opacity-70"
+                              className="text-[12px] font-semibold transition-opacity hover:opacity-60 flex-shrink-0"
                               style={{ color: "var(--terra-500)" }}
                             >
-                              <ChevronRight className="w-3.5 h-3.5" />
-                              Choose a different time
+                              Edit
                             </button>
                           </motion.div>
 
@@ -683,9 +680,9 @@ export default function ContactSection() {
                                       onClick={() => setAmPm(period)}
                                       className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all duration-150"
                                       style={{
-                                        background: amPm === period ? "var(--terra-500)" : "transparent",
-                                        border: `1px solid ${amPm === period ? "var(--terra-500)" : "#e7e5e4"}`,
-                                        color: amPm === period ? "#ffffff" : "#78716c",
+                                        background: amPm === period ? "var(--terra-light)" : "transparent",
+                                        border: `1px solid ${amPm === period ? "var(--terra-border)" : "#e7e5e4"}`,
+                                        color: amPm === period ? "var(--terra-600)" : "#78716c",
                                       }}
                                     >
                                       {period === "AM" ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
