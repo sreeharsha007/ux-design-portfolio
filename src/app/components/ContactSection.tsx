@@ -360,16 +360,30 @@ export default function ContactSection() {
           }),
         });
         if (!res.ok) {
-          // Capture Google's error detail so it's visible in the UI for debugging
           const body = await res.json().catch(() => ({}));
           throw new Error(body.detail ?? body.error ?? "Booking failed");
+        }
+      } else {
+        // Send a plain contact message via Resend
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name:    form.name,
+            email:   form.email,
+            message: form.message,
+          }),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error ?? "Failed to send message");
         }
       }
       setSubmitState("success");
     } catch (err: unknown) {
       setSubmitState("idle");
       const msg = err instanceof Error ? err.message : "Unknown error";
-      setSubmitError(`Booking failed: ${msg}`);
+      setSubmitError(`Submission failed: ${msg}`);
     }
   };
 
