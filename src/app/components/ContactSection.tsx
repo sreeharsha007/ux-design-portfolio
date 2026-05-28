@@ -83,10 +83,14 @@ function InlineCalendar({
   availableSlots,
   onSelect,
   onClose,
+  amPm,
+  onAmPmChange,
 }: {
   availableSlots: Slot[];
   onSelect: (slot: Slot) => void;
   onClose: () => void;
+  amPm: "AM" | "PM";
+  onAmPmChange: (p: "AM" | "PM") => void;
 }) {
   const today = new Date();
   const [viewYear,  setViewYear]  = useState(today.getFullYear());
@@ -121,6 +125,11 @@ function InlineCalendar({
         return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` === pickedDate;
       })
     : [];
+
+  // Filter by the shared AM/PM state
+  const filteredTimes = slotsForDate.filter(s =>
+    amPm === "AM" ? s.time.includes("AM") : s.time.includes("PM")
+  );
 
   const monthName = new Date(viewYear, viewMonth).toLocaleString("default", {
     month: "long", year: "numeric",
@@ -228,36 +237,62 @@ function InlineCalendar({
               className="mt-3 pt-3"
               style={{ borderTop: "1px solid #e7e5e4" }}
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-stone-400 mb-2">
-                Available times
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {slotsForDate.map(slot => (
+              {/* AM / PM toggle — same shared state as the chip picker */}
+              <div className="flex items-center gap-2 mb-3">
+                {(["AM", "PM"] as const).map(period => (
                   <button
-                    key={slot.id}
+                    key={period}
                     type="button"
-                    onClick={() => onSelect(slot)}
-                    className="px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all duration-150"
+                    onClick={() => onAmPmChange(period)}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all duration-150"
                     style={{
-                      background: "var(--terra-light)",
-                      border: "1px solid var(--terra-border)",
-                      color: "var(--terra-600)",
-                    }}
-                    onMouseEnter={e => {
-                      (e.currentTarget as HTMLElement).style.background = "var(--terra-500)";
-                      (e.currentTarget as HTMLElement).style.color = "#ffffff";
-                      (e.currentTarget as HTMLElement).style.borderColor = "var(--terra-500)";
-                    }}
-                    onMouseLeave={e => {
-                      (e.currentTarget as HTMLElement).style.background = "var(--terra-light)";
-                      (e.currentTarget as HTMLElement).style.color = "var(--terra-600)";
-                      (e.currentTarget as HTMLElement).style.borderColor = "var(--terra-border)";
+                      background: amPm === period ? "var(--terra-500)" : "transparent",
+                      border: `1px solid ${amPm === period ? "var(--terra-500)" : "#e7e5e4"}`,
+                      color: amPm === period ? "#ffffff" : "#78716c",
                     }}
                   >
-                    {slot.time}
+                    {period === "AM"
+                      ? <Sun  className="w-3 h-3" />
+                      : <Moon className="w-3 h-3" />
+                    }
+                    {period}
                   </button>
                 ))}
               </div>
+
+              {filteredTimes.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {filteredTimes.map(slot => (
+                    <button
+                      key={slot.id}
+                      type="button"
+                      onClick={() => onSelect(slot)}
+                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all duration-150"
+                      style={{
+                        background: "var(--terra-light)",
+                        border: "1px solid var(--terra-border)",
+                        color: "var(--terra-600)",
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLElement).style.background = "var(--terra-500)";
+                        (e.currentTarget as HTMLElement).style.color = "#ffffff";
+                        (e.currentTarget as HTMLElement).style.borderColor = "var(--terra-500)";
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLElement).style.background = "var(--terra-light)";
+                        (e.currentTarget as HTMLElement).style.color = "var(--terra-600)";
+                        (e.currentTarget as HTMLElement).style.borderColor = "var(--terra-border)";
+                      }}
+                    >
+                      {slot.time}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[12px] text-stone-400 py-1">
+                  No {amPm} times on this day.
+                </p>
+              )}
             </motion.div>
           )}
 
@@ -291,26 +326,58 @@ function SlotChip({
   slot,
   selected,
   onClick,
+  onClear,
 }: {
   slot: Slot;
   selected: boolean;
   onClick: () => void;
+  onClear?: () => void;
 }) {
+  if (selected) {
+    // Selected: non-interactive pill with X inside
+    return (
+      <div
+        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-semibold"
+        style={{
+          background: "var(--terra-500)",
+          border: "1px solid var(--terra-500)",
+          color: "#ffffff",
+          boxShadow: "0 2px 8px rgba(217,119,6,0.25)",
+        }}
+      >
+        <Clock className="w-3 h-3 flex-shrink-0" />
+        <span>{slot.label}</span>
+        <span style={{ opacity: 0.75 }}>·</span>
+        <span>{slot.time}</span>
+        {onClear && (
+          <button
+            type="button"
+            onClick={onClear}
+            title="Clear selection"
+            className="ml-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-colors hover:bg-white/25"
+          >
+            <X className="w-2.5 h-2.5" />
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // Unselected: plain clickable button
   return (
     <button
       type="button"
       onClick={onClick}
-      className="relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all duration-200"
+      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all duration-150 hover:border-stone-300"
       style={{
-        background: selected ? "var(--terra-500)" : "#ffffff",
-        border: selected ? "1px solid var(--terra-500)" : "1px solid #e7e5e4",
-        color: selected ? "#ffffff" : "#44403c",
-        boxShadow: selected ? "0 2px 8px rgba(217,119,6,0.25)" : "none",
+        background: "#ffffff",
+        border: "1px solid #e7e5e4",
+        color: "#44403c",
       }}
     >
       <Clock className="w-3 h-3 flex-shrink-0" />
       <span>{slot.label}</span>
-      <span style={{ opacity: selected ? 0.85 : 0.55 }}>·</span>
+      <span style={{ opacity: 0.45 }}>·</span>
       <span>{slot.time}</span>
     </button>
   );
@@ -325,7 +392,7 @@ export default function ContactSection() {
   const [selectedSlot,  setSelectedSlot]  = useState<Slot | null>(null);
   const [scheduleOn,    setScheduleOn]    = useState(false);
   const [amPm,          setAmPm]          = useState<"AM" | "PM">("AM");
-  const [calendarOpen,  setCalendarOpen]  = useState(false);
+  const [customMode,    setCustomMode]    = useState(false); // true = date picker, false = chip grid
   const [submitState,   setSubmitState]   = useState<SubmitState>("idle");
   const [submitError,   setSubmitError]   = useState<string | null>(null);
 
@@ -357,7 +424,7 @@ export default function ContactSection() {
 
   const selectSlot = useCallback((slot: Slot) => {
     setSelectedSlot(slot);
-    setCalendarOpen(false);
+    setCustomMode(false);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -622,7 +689,7 @@ export default function ContactSection() {
                               animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.8 }}
                               type="button"
-                              onClick={() => { setScheduleOn(false); setCalendarOpen(false); setSelectedSlot(null); }}
+                              onClick={() => { setScheduleOn(false); setCustomMode(false); setSelectedSlot(null); }}
                               className="w-6 h-6 rounded-full flex items-center justify-center transition-colors hover:bg-stone-100"
                             >
                               <X className="w-3.5 h-3.5 text-stone-400" />
@@ -632,130 +699,136 @@ export default function ContactSection() {
                       </div>
 
                       <AnimatePresence mode="wait">
-                        {scheduleOn ? (
+
+                        {/* ── MODE 1: slot already selected ───────────────── */}
+                        {scheduleOn && selectedSlot ? (
                           <motion.div
-                            key="slots"
-                            initial={{ opacity: 0, y: 6 }}
+                            key="selected"
+                            initial={{ opacity: 0, y: 4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -4 }}
-                            transition={{ duration: 0.22, ease }}
+                            transition={{ duration: 0.2, ease }}
                           >
-                            <AnimatePresence mode="wait">
-                              {selectedSlot ? (
-
-                                /* ── Selected: collapsed pill + edit option ── */
-                                <motion.div
-                                  key="selected"
-                                  initial={{ opacity: 0, y: 4 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -4 }}
-                                  transition={{ duration: 0.2, ease }}
-                                >
-                                  <div className="flex items-center gap-2 flex-wrap mb-2">
-                                    <SlotChip slot={selectedSlot} selected={true} onClick={() => {}} />
-                                    <button
-                                      type="button"
-                                      title="Clear selected slot"
-                                      onClick={() => { setSelectedSlot(null); setCalendarOpen(false); }}
-                                      className="w-5 h-5 rounded-full flex items-center justify-center transition-colors hover:bg-stone-100"
-                                    >
-                                      <X className="w-3 h-3 text-stone-400" />
-                                    </button>
-                                  </div>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => setCalendarOpen(o => !o)}
-                                    className="flex items-center gap-1.5 text-[12px] font-semibold transition-opacity hover:opacity-70"
-                                    style={{ color: "var(--terra-500)" }}
-                                  >
-                                    <ChevronRight
-                                      className="w-3.5 h-3.5 transition-transform duration-200"
-                                      style={{ transform: calendarOpen ? "rotate(90deg)" : "rotate(0deg)" }}
-                                    />
-                                    {calendarOpen ? "Close calendar" : "Choose a different time"}
-                                  </button>
-
-                                  <AnimatePresence>
-                                    {calendarOpen && (
-                                      <InlineCalendar
-                                        availableSlots={slots}
-                                        onSelect={selectSlot}
-                                        onClose={() => setCalendarOpen(false)}
-                                      />
-                                    )}
-                                  </AnimatePresence>
-                                </motion.div>
-
-                              ) : (
-
-                                /* ── Picker: 2-col AM/PM + chip grid ─────── */
-                                <motion.div
-                                  key="picker"
-                                  initial={{ opacity: 0, y: 4 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -4 }}
-                                  transition={{ duration: 0.2, ease }}
-                                >
-                                  <div className="flex gap-3">
-
-                                    {/* Left — AM / PM icon toggle */}
-                                    <div className="flex flex-col gap-2 flex-shrink-0">
-                                      {(["AM", "PM"] as const).map(period => (
-                                        <button
-                                          key={period}
-                                          type="button"
-                                          onClick={() => setAmPm(period)}
-                                          className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-150"
-                                          style={{
-                                            background: amPm === period ? "var(--terra-500)" : "transparent",
-                                            border: `1px solid ${amPm === period ? "var(--terra-500)" : "#e7e5e4"}`,
-                                            color: amPm === period ? "#ffffff" : "#78716c",
-                                          }}
-                                        >
-                                          {period === "AM"
-                                            ? <Sun  className="w-3.5 h-3.5" />
-                                            : <Moon className="w-3.5 h-3.5" />
-                                          }
-                                          <span className="text-[10px] font-bold leading-none">{period}</span>
-                                        </button>
-                                      ))}
-                                    </div>
-
-                                    {/* Right — filtered slot chips, scrollable */}
-                                    <div
-                                      className="flex-1 flex flex-wrap gap-2 content-start overflow-y-auto"
-                                      style={{ maxHeight: 168, scrollbarWidth: "none" }}
-                                    >
-                                      {slotsLoading
-                                        ? Array.from({ length: 4 }).map((_, i) => (
-                                            <div key={i} className="h-8 rounded-xl animate-pulse" style={{ width: 140, background: "#f0ede9" }} />
-                                          ))
-                                        : filteredSlots.length > 0
-                                          ? filteredSlots.slice(0, 20).map(slot => (
-                                              <SlotChip
-                                                key={slot.id}
-                                                slot={slot}
-                                                selected={false}
-                                                onClick={() => selectSlot(slot)}
-                                              />
-                                            ))
-                                          : (
-                                            <p className="text-[12px] text-stone-400 py-1">
-                                              No {amPm} slots available right now.
-                                            </p>
-                                          )
-                                      }
-                                    </div>
-                                  </div>
-
-                                  <p className="text-[11px] text-stone-400 mt-2.5">
-                                    All times shown in IST (UTC+5:30)
-                                  </p>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
+                            <SlotChip
+                              slot={selectedSlot}
+                              selected={true}
+                              onClick={() => {}}
+                              onClear={() => { setSelectedSlot(null); setCustomMode(false); }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => { setSelectedSlot(null); setCustomMode(false); }}
+                              className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold transition-opacity hover:opacity-70"
+                              style={{ color: "var(--terra-500)" }}
+                            >
+                              <ChevronRight className="w-3.5 h-3.5" />
+                              Choose a different time
+                            </button>
                           </motion.div>
+
+                        /* ── MODE 2: custom date picker (calendar) ──────── */
+                        ) : scheduleOn && customMode ? (
+                          <motion.div
+                            key="custom"
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.2, ease }}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => setCustomMode(false)}
+                              className="flex items-center gap-1 text-[12px] font-semibold mb-1 transition-opacity hover:opacity-70"
+                              style={{ color: "var(--terra-500)" }}
+                            >
+                              <ChevronLeft className="w-3.5 h-3.5" />
+                              Back to suggested times
+                            </button>
+                            <InlineCalendar
+                              availableSlots={slots}
+                              onSelect={selectSlot}
+                              onClose={() => setCustomMode(false)}
+                              amPm={amPm}
+                              onAmPmChange={setAmPm}
+                            />
+                          </motion.div>
+
+                        /* ── MODE 3: suggested chip grid (default) ──────── */
+                        ) : scheduleOn ? (
+                          <motion.div
+                            key="suggested"
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            transition={{ duration: 0.2, ease }}
+                          >
+                            <div className="flex gap-3">
+                              {/* Left — AM / PM icon toggle */}
+                              <div className="flex flex-col gap-2 flex-shrink-0">
+                                {(["AM", "PM"] as const).map(period => (
+                                  <button
+                                    key={period}
+                                    type="button"
+                                    onClick={() => setAmPm(period)}
+                                    className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-150"
+                                    style={{
+                                      background: amPm === period ? "var(--terra-500)" : "transparent",
+                                      border: `1px solid ${amPm === period ? "var(--terra-500)" : "#e7e5e4"}`,
+                                      color: amPm === period ? "#ffffff" : "#78716c",
+                                    }}
+                                  >
+                                    {period === "AM"
+                                      ? <Sun  className="w-3.5 h-3.5" />
+                                      : <Moon className="w-3.5 h-3.5" />
+                                    }
+                                    <span className="text-[10px] font-bold leading-none">{period}</span>
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Right — filtered chips, scrollable */}
+                              <div
+                                className="flex-1 flex flex-wrap gap-2 content-start overflow-y-auto"
+                                style={{ maxHeight: 168, scrollbarWidth: "none" }}
+                              >
+                                {slotsLoading
+                                  ? Array.from({ length: 4 }).map((_, i) => (
+                                      <div key={i} className="h-8 rounded-xl animate-pulse" style={{ width: 140, background: "#f0ede9" }} />
+                                    ))
+                                  : filteredSlots.length > 0
+                                    ? filteredSlots.slice(0, 20).map(slot => (
+                                        <SlotChip
+                                          key={slot.id}
+                                          slot={slot}
+                                          selected={false}
+                                          onClick={() => selectSlot(slot)}
+                                        />
+                                      ))
+                                    : (
+                                      <p className="text-[12px] text-stone-400 py-1">
+                                        No {amPm} slots available right now.
+                                      </p>
+                                    )
+                                }
+                              </div>
+                            </div>
+
+                            {/* Custom time link + IST note */}
+                            <div className="flex items-center justify-between mt-2.5">
+                              <button
+                                type="button"
+                                onClick={() => setCustomMode(true)}
+                                className="flex items-center gap-1.5 text-[12px] font-semibold transition-opacity hover:opacity-70"
+                                style={{ color: "var(--terra-500)" }}
+                              >
+                                <ChevronRight className="w-3.5 h-3.5" />
+                                Choose a custom time
+                              </button>
+                              <span className="text-[11px] text-stone-400">IST (UTC+5:30)</span>
+                            </div>
+                          </motion.div>
+
+                        /* ── SCHEDULING OFF: re-enable button ───────────── */
                         ) : (
                           <motion.button
                             key="reenable"
