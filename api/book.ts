@@ -1,10 +1,11 @@
 /**
  * POST /api/book
- * Creates a Google Calendar event and sends invites to both parties.
+ * Creates a Google Calendar event with a Google Meet link and invites the visitor.
  *
  * Env vars required:
- *   GOOGLE_SERVICE_ACCOUNT_EMAIL
- *   GOOGLE_PRIVATE_KEY
+ *   GOOGLE_OAUTH_CLIENT_ID
+ *   GOOGLE_OAUTH_CLIENT_SECRET
+ *   GOOGLE_OAUTH_REFRESH_TOKEN
  *   GOOGLE_CALENDAR_ID
  *
  * Request body (JSON):
@@ -16,7 +17,7 @@
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { GoogleAuth } from "google-auth-library";
+import { OAuth2Client } from "google-auth-library";
 
 const TIMEZONE = "Asia/Kolkata";
 
@@ -30,17 +31,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const auth = new GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key:  process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      },
-      scopes: ["https://www.googleapis.com/auth/calendar.events"],
+    const oauth2Client = new OAuth2Client(
+      process.env.GOOGLE_OAUTH_CLIENT_ID,
+      process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+    );
+
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN,
     });
 
-    const client      = await auth.getClient();
-    const tokenResult = await (client as any).getAccessToken();
-    const token       = tokenResult.token as string;
+    const { token } = await oauth2Client.getAccessToken();
 
     const calendarId = process.env.GOOGLE_CALENDAR_ID!;
 
@@ -55,14 +55,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ].filter(Boolean).join("\n"),
       start: { dateTime: slotIso, timeZone: TIMEZONE },
       end:   { dateTime: endIso,  timeZone: TIMEZONE },
-      // NOTE: attendees omitted — service accounts cannot invite attendees without
-      // Google Workspace Domain-Wide Delegation (not available on personal Gmail).
-      // The event appears directly on Harsha's calendar; visitor details are in
-      // the description above.
+      attendees: [{ email }],
+      conferenceData: {
+        createRequest: {
+          requestId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          conferenceSolutionKey: { type: "hangoutsMeet" },
+        },
+      },
     };
 
-    // sendUpdates=none — no attendees to notify, so no emails to send.
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?sendUpdates=none`;
+    // conferenceDataVersion=1 tells Google to process the conferenceData and generate a Meet link.
+    // sendUpdates=all sends Google's native calendar invite to the attendee.
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1&sendUpdates=all`;
 
     const gcalRes = await fetch(url, {
       method: "POST",
@@ -73,7 +77,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!gcalRes.ok) {
       const errText = await gcalRes.text();
       console.error("Google Calendar create error:", gcalRes.status, errText);
-      // Return Google's error detail so it's visible in the inline UI during debugging
       return res.status(500).json({
         error: "Failed to create calendar event",
         detail: errText,
@@ -81,10 +84,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const created = await gcalRes.json();
+    const meetLink = created.conferenceData?.entryPoints?.find(
+      (e: any) => e.entryPointType === "video"
+    )?.uri ?? null;
+
     return res.status(200).json({
       success:   true,
       eventId:   created.id,
       eventLink: created.htmlLink ?? null,
+      meetLink,
     });
 
   } catch (err) {
