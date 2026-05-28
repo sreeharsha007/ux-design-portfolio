@@ -1054,7 +1054,7 @@ export default function Homepage() {
                       transition={{ duration: 0.55, delay: 0.08 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
                     >
                       <img
-                        src="/Hero Image.png"
+                        src={project.heroImage ?? "/Hero Image.png"}
                         alt={project.title}
                         className="w-full h-full object-cover object-top"
                         style={{
@@ -1126,7 +1126,7 @@ export default function Homepage() {
                       transition={{ duration: 0.5, delay: 0.06 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
                     >
                       <img
-                        src="/Hero Image.png"
+                        src={project.heroImage ?? "/Hero Image.png"}
                         alt={project.title}
                         className="w-full h-full object-cover object-top"
                         style={{
