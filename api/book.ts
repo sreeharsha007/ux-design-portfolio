@@ -55,17 +55,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ].filter(Boolean).join("\n"),
       start: { dateTime: slotIso, timeZone: TIMEZONE },
       end:   { dateTime: endIso,  timeZone: TIMEZONE },
-      // Visitor gets a calendar invite; the organiser (Harsha) sees it via the
-      // calendar the service account has write-access to.
-      // NOTE: conferenceData (Meet link) is intentionally omitted — Meet link
-      // creation via API requires Google Workspace, not personal Gmail.
-      attendees: [
-        { email, displayName: name },
-      ],
+      // NOTE: attendees omitted — service accounts cannot invite attendees without
+      // Google Workspace Domain-Wide Delegation (not available on personal Gmail).
+      // The event appears directly on Harsha's calendar; visitor details are in
+      // the description above.
     };
 
-    // sendUpdates=all → Google sends a calendar invite email to the visitor.
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?sendUpdates=all`;
+    // sendUpdates=none — no attendees to notify, so no emails to send.
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?sendUpdates=none`;
 
     const gcalRes = await fetch(url, {
       method: "POST",
