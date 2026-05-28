@@ -28,3 +28,7 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Google OAuth credentials — contains secrets, never commit
+google-oauth-creds.json
+get-refresh-token.mjs
