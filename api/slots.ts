@@ -11,13 +11,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { GoogleAuth } from "google-auth-library";
 
-// ─── Config ───────────────────────────────────────────────────────────────────
-const WORKING_DAYS  = [1, 2, 3, 4, 5]; // Mon–Fri
-const START_HOUR    = 9;                // 9:00 AM IST
-const END_HOUR      = 18;              // 6:00 PM IST
+// ─── ✏️  Edit these constants to change your availability ────────────────────
+// WORKING_DAYS: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
+const WORKING_DAYS  = [0, 1, 2, 3, 4, 5, 6]; // every day of the week
+const START_HOUR    = 7;               // 7:00 AM IST — first slot of the day
+const END_HOUR      = 21;             // 9:00 PM IST — last slot starts at 8:30 PM
 const SLOT_MINUTES  = 30;
-const BUFFER_MINS   = 15;              // gap around existing events
-const DAYS_AHEAD = 14; // return all slots across next 14 days (~250 slots)
+const BUFFER_MINS   = 15;             // buffer (mins) padded around existing calendar events
+const DAYS_AHEAD    = 14;             // how many days ahead to expose slots
 const TIMEZONE      = "Asia/Kolkata";
 const IST_OFFSET_MS = 5.5 * 60 * 60_000; // UTC+5:30 in milliseconds
 
