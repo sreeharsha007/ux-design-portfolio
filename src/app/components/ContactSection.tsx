@@ -77,246 +77,146 @@ const focusField = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
 const blurField = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) =>
   (e.currentTarget.style.borderColor = "#e7e5e4");
 
-// ─── Mini inline calendar ─────────────────────────────────────────────────────
+// ─── Date helpers ────────────────────────────────────────────────────────────
 
-function InlineCalendar({
-  availableSlots,
-  onSelect,
-  onClose,
-  amPm,
-  onAmPmChange,
+function dateKey(d: Date): string {
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+function getMondayOfWeek(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const dow = d.getDay();
+  d.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow));
+  return d;
+}
+function addDays(d: Date, n: number): Date {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+function jumpToMonth(from: Date, dir: -1 | 1): Date {
+  const d = new Date(from);
+  d.setDate(1);
+  d.setMonth(d.getMonth() + dir);
+  return getMondayOfWeek(d);
+}
+
+// ─── Week picker ──────────────────────────────────────────────────────────────
+
+function WeekPicker({
+  weekStart,
+  selectedDate,
+  availDates,
+  onDateSelect,
+  onWeekChange,
 }: {
-  availableSlots: Slot[];
-  onSelect: (slot: Slot) => void;
-  onClose: () => void;
-  amPm: "AM" | "PM";
-  onAmPmChange: (p: "AM" | "PM") => void;
+  weekStart: Date;
+  selectedDate: string | null;
+  availDates: Set<string>;
+  onDateSelect: (key: string | null) => void;
+  onWeekChange: (d: Date) => void;
 }) {
   const today = new Date();
-  const [viewYear,  setViewYear]  = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
-  const [pickedDate, setPickedDate] = useState<string | null>(null);
+  today.setHours(0, 0, 0, 0);
 
-  // Build calendar grid
-  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-  const blanks = (firstDay + 6) % 7; // Mon-start offset
+  const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  const firstDay = days[0];
+  const lastDay  = days[6];
+  const todayKey = dateKey(today);
 
-  // Available dates for this view
-  const availDates = new Set(
-    availableSlots.map(s => {
-      const d = new Date(s.iso);
-      return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    })
-  );
-
-  const isAvailable = (day: number) =>
-    availDates.has(`${viewYear}-${viewMonth}-${day}`);
-
-  const isPast = (day: number) => {
-    const d = new Date(viewYear, viewMonth, day);
-    d.setHours(23, 59, 59);
-    return d < today;
-  };
-
-  const slotsForDate = pickedDate
-    ? availableSlots.filter(s => {
-        const d = new Date(s.iso);
-        return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` === pickedDate;
-      })
-    : [];
-
-  // Filter by the shared AM/PM state
-  const filteredTimes = slotsForDate.filter(s =>
-    amPm === "AM" ? s.time.includes("AM") : s.time.includes("PM")
-  );
-
-  const monthName = new Date(viewYear, viewMonth).toLocaleString("default", {
-    month: "long", year: "numeric",
-  });
-
-  const prevMonth = () => {
-    if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
-    else setViewMonth(m => m - 1);
-    setPickedDate(null);
-  };
-  const nextMonth = () => {
-    if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
-    else setViewMonth(m => m + 1);
-    setPickedDate(null);
-  };
+  const prevMonthLabel = new Date(firstDay.getFullYear(), firstDay.getMonth() - 1, 1)
+    .toLocaleString("default", { month: "short" });
+  const nextMonthLabel = new Date(lastDay.getFullYear(), lastDay.getMonth() + 1, 1)
+    .toLocaleString("default", { month: "short" });
+  const weekLabel = firstDay.getMonth() === lastDay.getMonth()
+    ? firstDay.toLocaleString("default", { month: "long", year: "numeric" })
+    : `${firstDay.toLocaleString("default", { month: "short" })} – ${lastDay.toLocaleString("default", { month: "short", year: "numeric" })}`;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.3, ease }}
-      style={{ overflow: "hidden" }}
-    >
-      <div
-        className="mt-3 rounded-xl p-4"
-        style={{ background: "#faf9f8", border: "1px solid #e7e5e4" }}
-      >
-        {/* Month nav */}
-        <div className="flex items-center justify-between mb-3">
+    <div className="rounded-xl p-3" style={{ background: "#faf9f8", border: "1px solid #e7e5e4" }}>
+
+      {/* Navigation row */}
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-0.5">
           <button
             type="button"
-            onClick={prevMonth}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-stone-100"
+            onClick={() => onWeekChange(jumpToMonth(weekStart, -1))}
+            className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
           >
-            <ChevronLeft className="w-4 h-4 text-stone-500" />
+            <ChevronLeft className="w-3 h-3" />{prevMonthLabel}
           </button>
-          <span className="text-[13px] font-semibold text-stone-700">{monthName}</span>
           <button
             type="button"
-            onClick={nextMonth}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-stone-100"
+            onClick={() => onWeekChange(addDays(weekStart, -7))}
+            className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-stone-100 transition-colors"
           >
-            <ChevronRight className="w-4 h-4 text-stone-500" />
+            <ChevronLeft className="w-3.5 h-3.5 text-stone-500" />
           </button>
         </div>
 
-        {/* Day headers */}
-        <div className="grid grid-cols-7 mb-1">
-          {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(d => (
-            <div key={d} className="text-center text-[10px] font-semibold text-stone-400 py-1">
-              {d}
-            </div>
-          ))}
+        <span className="text-[12px] font-semibold text-stone-600">{weekLabel}</span>
+
+        <div className="flex items-center gap-0.5">
+          <button
+            type="button"
+            onClick={() => onWeekChange(addDays(weekStart, 7))}
+            className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-stone-100 transition-colors"
+          >
+            <ChevronRight className="w-3.5 h-3.5 text-stone-500" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onWeekChange(jumpToMonth(weekStart, 1))}
+            className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
+          >
+            {nextMonthLabel}<ChevronRight className="w-3 h-3" />
+          </button>
         </div>
-
-        {/* Date cells */}
-        <div className="grid grid-cols-7 gap-y-0.5">
-          {Array.from({ length: blanks }).map((_, i) => <div key={`b${i}`} />)}
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1;
-            const key = `${viewYear}-${viewMonth}-${day}`;
-            const available = isAvailable(day) && !isPast(day);
-            const picked = pickedDate === key;
-
-            return (
-              <button
-                key={day}
-                type="button"
-                disabled={!available}
-                onClick={() => setPickedDate(picked ? null : key)}
-                className="aspect-square flex items-center justify-center rounded-lg text-[12px] font-medium transition-all duration-150"
-                style={{
-                  color: available ? (picked ? "#ffffff" : "#1c1917") : "#d4ccc8",
-                  background: picked
-                    ? "var(--terra-500)"
-                    : available
-                    ? "transparent"
-                    : "transparent",
-                  cursor: available ? "pointer" : "default",
-                }}
-                onMouseEnter={e => {
-                  if (available && !picked)
-                    (e.currentTarget as HTMLElement).style.background = "var(--terra-light)";
-                }}
-                onMouseLeave={e => {
-                  if (!picked)
-                    (e.currentTarget as HTMLElement).style.background = "transparent";
-                }}
-              >
-                {day}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Time slots for picked date */}
-        <AnimatePresence>
-          {pickedDate && slotsForDate.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 4 }}
-              transition={{ duration: 0.2, ease }}
-              className="mt-3 pt-3"
-              style={{ borderTop: "1px solid #e7e5e4" }}
-            >
-              {/* AM / PM toggle — same shared state as the chip picker */}
-              <div className="flex items-center gap-2 mb-3">
-                {(["AM", "PM"] as const).map(period => (
-                  <button
-                    key={period}
-                    type="button"
-                    onClick={() => onAmPmChange(period)}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all duration-150"
-                    style={{
-                      background: amPm === period ? "var(--terra-500)" : "transparent",
-                      border: `1px solid ${amPm === period ? "var(--terra-500)" : "#e7e5e4"}`,
-                      color: amPm === period ? "#ffffff" : "#78716c",
-                    }}
-                  >
-                    {period === "AM"
-                      ? <Sun  className="w-3 h-3" />
-                      : <Moon className="w-3 h-3" />
-                    }
-                    {period}
-                  </button>
-                ))}
-              </div>
-
-              {filteredTimes.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {filteredTimes.map(slot => (
-                    <button
-                      key={slot.id}
-                      type="button"
-                      onClick={() => onSelect(slot)}
-                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all duration-150"
-                      style={{
-                        background: "var(--terra-light)",
-                        border: "1px solid var(--terra-border)",
-                        color: "var(--terra-600)",
-                      }}
-                      onMouseEnter={e => {
-                        (e.currentTarget as HTMLElement).style.background = "var(--terra-500)";
-                        (e.currentTarget as HTMLElement).style.color = "#ffffff";
-                        (e.currentTarget as HTMLElement).style.borderColor = "var(--terra-500)";
-                      }}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLElement).style.background = "var(--terra-light)";
-                        (e.currentTarget as HTMLElement).style.color = "var(--terra-600)";
-                        (e.currentTarget as HTMLElement).style.borderColor = "var(--terra-border)";
-                      }}
-                    >
-                      {slot.time}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-[12px] text-stone-400 py-1">
-                  No {amPm} times on this day.
-                </p>
-              )}
-            </motion.div>
-          )}
-
-          {pickedDate && slotsForDate.length === 0 && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-3 text-[12px] text-stone-400 text-center py-2"
-            >
-              No available times on this day.
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        {/* Close calendar */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="mt-3 w-full text-[12px] text-stone-400 hover:text-stone-600 transition-colors text-center"
-        >
-          Cancel
-        </button>
       </div>
-    </motion.div>
+
+      {/* Day-of-week headers */}
+      <div className="grid grid-cols-7 mb-1">
+        {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map(d => (
+          <div key={d} className="text-center text-[10px] font-semibold text-stone-400 pb-1">{d}</div>
+        ))}
+      </div>
+
+      {/* Day cells — single row */}
+      <div className="grid grid-cols-7 gap-0.5">
+        {days.map(day => {
+          const key       = dateKey(day);
+          const available = availDates.has(key) && day >= today;
+          const picked    = selectedDate === key;
+          const isToday   = key === todayKey;
+
+          return (
+            <button
+              key={key}
+              type="button"
+              disabled={!available}
+              onClick={() => onDateSelect(picked ? null : key)}
+              className="aspect-square flex items-center justify-center rounded-xl text-[13px] font-medium transition-all duration-150"
+              style={{
+                background: picked ? "var(--terra-500)" : "transparent",
+                border: isToday && !picked ? "1px solid #d4ccc8" : "1px solid transparent",
+                color: picked ? "#ffffff" : available ? "#1c1917" : "#d4ccc8",
+                cursor: available ? "pointer" : "default",
+              }}
+              onMouseEnter={e => {
+                if (available && !picked)
+                  (e.currentTarget as HTMLElement).style.background = "var(--terra-light)";
+              }}
+              onMouseLeave={e => {
+                if (!picked)
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+              }}
+            >
+              {day.getDate()}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -392,14 +292,33 @@ export default function ContactSection() {
   const [selectedSlot,  setSelectedSlot]  = useState<Slot | null>(null);
   const [scheduleOn,    setScheduleOn]    = useState(false);
   const [amPm,          setAmPm]          = useState<"AM" | "PM">("AM");
-  const [customMode,    setCustomMode]    = useState(false); // true = date picker, false = chip grid
+  const [selectedDate,  setSelectedDate]  = useState<string | null>(null);
+  const [weekStart,     setWeekStart]     = useState<Date>(() => getMondayOfWeek(new Date()));
   const [submitState,   setSubmitState]   = useState<SubmitState>("idle");
   const [submitError,   setSubmitError]   = useState<string | null>(null);
 
-  // Slots filtered to the selected AM / PM period (used by the chip picker)
-  const filteredSlots = slots.filter(s =>
-    amPm === "AM" ? s.time.includes("AM") : s.time.includes("PM")
-  );
+  // Dates that have at least one available slot — drives WeekPicker highlighting
+  const availDates = new Set(slots.map(s => dateKey(new Date(s.iso))));
+
+  // If a date is selected show that day's slots, otherwise show all (suggested)
+  const slotsForView = selectedDate
+    ? slots.filter(s => dateKey(new Date(s.iso)) === selectedDate)
+    : slots;
+
+  // Filtered by AM/PM, capped at 20
+  const filteredViewSlots = slotsForView
+    .filter(s => amPm === "AM" ? s.time.includes("AM") : s.time.includes("PM"))
+    .slice(0, 20);
+
+  // Readable label for the selected date, e.g. "Thu 29 May"
+  const selectedDateLabel = selectedDate
+    ? (() => {
+        const [y, m, d] = selectedDate.split("-").map(Number);
+        return new Date(y, m, d).toLocaleDateString("en-GB", {
+          weekday: "short", day: "numeric", month: "short",
+        });
+      })()
+    : null;
 
   // Fetch real slots from /api/slots on mount; fall back to mock if unavailable
   useEffect(() => {
@@ -424,7 +343,6 @@ export default function ContactSection() {
 
   const selectSlot = useCallback((slot: Slot) => {
     setSelectedSlot(slot);
-    setCustomMode(false);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -599,6 +517,7 @@ export default function ContactSection() {
                         setSubmitState("idle");
                         setForm({ name: "", email: "", message: "" });
                         setSelectedSlot(null);
+                        setSelectedDate(null);
                         setScheduleOn(false);
                       }}
                       className="mt-6 text-[13px] font-medium transition-opacity hover:opacity-60"
@@ -667,7 +586,7 @@ export default function ContactSection() {
                       style={{ background: "#faf9f8", border: "1px solid #f0ede9" }}
                     >
                       {/* Row header */}
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--terra-500)" }} />
                           <span className="text-[12px] font-semibold" style={{ color: "#44403c" }}>
@@ -681,26 +600,29 @@ export default function ContactSection() {
                           </span>
                         </div>
 
-                        {/* Toggle off */}
-                        <AnimatePresence>
-                          {scheduleOn && (
-                            <motion.button
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              type="button"
-                              onClick={() => { setScheduleOn(false); setCustomMode(false); setSelectedSlot(null); }}
-                              className="w-6 h-6 rounded-full flex items-center justify-center transition-colors hover:bg-stone-100"
-                            >
-                              <X className="w-3.5 h-3.5 text-stone-400" />
-                            </motion.button>
-                          )}
-                        </AnimatePresence>
+                        {/* Pill toggle */}
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={scheduleOn}
+                          onClick={() => {
+                            const next = !scheduleOn;
+                            setScheduleOn(next);
+                            if (!next) { setSelectedSlot(null); setSelectedDate(null); }
+                          }}
+                          className="relative flex-shrink-0 w-9 h-5 rounded-full transition-colors duration-200"
+                          style={{ background: scheduleOn ? "var(--terra-500)" : "#d4ccc8" }}
+                        >
+                          <span
+                            className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 block"
+                            style={{ transform: scheduleOn ? "translateX(20px)" : "translateX(2px)" }}
+                          />
+                        </button>
                       </div>
 
                       <AnimatePresence mode="wait">
 
-                        {/* ── MODE 1: slot already selected ───────────────── */}
+                        {/* ── SELECTED: collapsed pill ────────────────────── */}
                         {scheduleOn && selectedSlot ? (
                           <motion.div
                             key="selected"
@@ -708,16 +630,17 @@ export default function ContactSection() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -4 }}
                             transition={{ duration: 0.2, ease }}
+                            className="mt-3"
                           >
                             <SlotChip
                               slot={selectedSlot}
-                              selected={true}
+                              selected
                               onClick={() => {}}
-                              onClear={() => { setSelectedSlot(null); setCustomMode(false); }}
+                              onClear={() => { setSelectedSlot(null); }}
                             />
                             <button
                               type="button"
-                              onClick={() => { setSelectedSlot(null); setCustomMode(false); }}
+                              onClick={() => setSelectedSlot(null)}
                               className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold transition-opacity hover:opacity-70"
                               style={{ color: "var(--terra-500)" }}
                             >
@@ -726,77 +649,60 @@ export default function ContactSection() {
                             </button>
                           </motion.div>
 
-                        /* ── MODE 2: custom date picker (calendar) ──────── */
-                        ) : scheduleOn && customMode ? (
-                          <motion.div
-                            key="custom"
-                            initial={{ opacity: 0, y: 4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -4 }}
-                            transition={{ duration: 0.2, ease }}
-                          >
-                            <button
-                              type="button"
-                              onClick={() => setCustomMode(false)}
-                              className="flex items-center gap-1 text-[12px] font-semibold mb-1 transition-opacity hover:opacity-70"
-                              style={{ color: "var(--terra-500)" }}
-                            >
-                              <ChevronLeft className="w-3.5 h-3.5" />
-                              Back to suggested times
-                            </button>
-                            <InlineCalendar
-                              availableSlots={slots}
-                              onSelect={selectSlot}
-                              onClose={() => setCustomMode(false)}
-                              amPm={amPm}
-                              onAmPmChange={setAmPm}
-                            />
-                          </motion.div>
-
-                        /* ── MODE 3: suggested chip grid (default) ──────── */
+                        /* ── PICKER: week + slots (default when on) ─────── */
                         ) : scheduleOn ? (
                           <motion.div
-                            key="suggested"
+                            key="picker"
                             initial={{ opacity: 0, y: 4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -4 }}
                             transition={{ duration: 0.2, ease }}
+                            className="mt-3 space-y-3"
                           >
-                            <div className="flex gap-3">
-                              {/* Left — AM / PM icon toggle */}
-                              <div className="flex flex-col gap-2 flex-shrink-0">
-                                {(["AM", "PM"] as const).map(period => (
-                                  <button
-                                    key={period}
-                                    type="button"
-                                    onClick={() => setAmPm(period)}
-                                    className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-150"
-                                    style={{
-                                      background: amPm === period ? "var(--terra-500)" : "transparent",
-                                      border: `1px solid ${amPm === period ? "var(--terra-500)" : "#e7e5e4"}`,
-                                      color: amPm === period ? "#ffffff" : "#78716c",
-                                    }}
-                                  >
-                                    {period === "AM"
-                                      ? <Sun  className="w-3.5 h-3.5" />
-                                      : <Moon className="w-3.5 h-3.5" />
-                                    }
-                                    <span className="text-[10px] font-bold leading-none">{period}</span>
-                                  </button>
-                                ))}
+                            {/* Week date picker */}
+                            <WeekPicker
+                              weekStart={weekStart}
+                              selectedDate={selectedDate}
+                              availDates={availDates}
+                              onDateSelect={setSelectedDate}
+                              onWeekChange={setWeekStart}
+                            />
+
+                            {/* Slots section */}
+                            <div>
+                              {/* Row 1: heading left, AM/PM right */}
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-stone-400">
+                                  {selectedDate ? `Available · ${selectedDateLabel}` : "Suggested times"}
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  {(["AM", "PM"] as const).map(period => (
+                                    <button
+                                      key={period}
+                                      type="button"
+                                      onClick={() => setAmPm(period)}
+                                      className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all duration-150"
+                                      style={{
+                                        background: amPm === period ? "var(--terra-500)" : "transparent",
+                                        border: `1px solid ${amPm === period ? "var(--terra-500)" : "#e7e5e4"}`,
+                                        color: amPm === period ? "#ffffff" : "#78716c",
+                                      }}
+                                    >
+                                      {period === "AM" ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
+                                      {period}
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
 
-                              {/* Right — filtered chips, scrollable */}
-                              <div
-                                className="flex-1 flex flex-wrap gap-2 content-start overflow-y-auto"
-                                style={{ maxHeight: 168, scrollbarWidth: "none" }}
-                              >
+                              {/* Row 2: chips */}
+                              <div className="flex flex-wrap gap-2">
                                 {slotsLoading
-                                  ? Array.from({ length: 4 }).map((_, i) => (
+                                  ? Array.from({ length: 3 }).map((_, i) => (
                                       <div key={i} className="h-8 rounded-xl animate-pulse" style={{ width: 140, background: "#f0ede9" }} />
                                     ))
-                                  : filteredSlots.length > 0
-                                    ? filteredSlots.slice(0, 20).map(slot => (
+                                  : filteredViewSlots.length > 0
+                                    ? filteredViewSlots.map(slot => (
                                         <SlotChip
                                           key={slot.id}
                                           slot={slot}
@@ -806,44 +712,17 @@ export default function ContactSection() {
                                       ))
                                     : (
                                       <p className="text-[12px] text-stone-400 py-1">
-                                        No {amPm} slots available right now.
+                                        No {amPm} slots {selectedDate ? "on this day" : "available right now"}.
                                       </p>
                                     )
                                 }
                               </div>
-                            </div>
 
-                            {/* Custom time link + IST note */}
-                            <div className="flex items-center justify-between mt-2.5">
-                              <button
-                                type="button"
-                                onClick={() => setCustomMode(true)}
-                                className="flex items-center gap-1.5 text-[12px] font-semibold transition-opacity hover:opacity-70"
-                                style={{ color: "var(--terra-500)" }}
-                              >
-                                <ChevronRight className="w-3.5 h-3.5" />
-                                Choose a custom time
-                              </button>
-                              <span className="text-[11px] text-stone-400">IST (UTC+5:30)</span>
+                              <p className="text-[11px] text-stone-400 mt-2">All times in IST (UTC+5:30)</p>
                             </div>
                           </motion.div>
 
-                        /* ── SCHEDULING OFF: re-enable button ───────────── */
-                        ) : (
-                          <motion.button
-                            key="reenable"
-                            type="button"
-                            onClick={() => setScheduleOn(true)}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.18 }}
-                            className="text-[12px] font-medium transition-opacity hover:opacity-70"
-                            style={{ color: "var(--terra-500)" }}
-                          >
-                            + Add a time slot
-                          </motion.button>
-                        )}
+                        ) : null}
                       </AnimatePresence>
                     </div>
 
