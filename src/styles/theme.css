@@ -123,8 +123,11 @@
 :root {
   --terra-50:  #fef3c7;
   --terra-100: #fde68a;
+  --terra-400: #f59e0b;
   --terra-500: #d97706;
   --terra-600: #b45309;
+  --terra-light:  rgba(217, 119, 6, 0.08);
+  --terra-border: rgba(217, 119, 6, 0.20);
 
   --font-display: "Bricolage Grotesque", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body:    "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;

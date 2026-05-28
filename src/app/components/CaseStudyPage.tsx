@@ -9,6 +9,7 @@ import { projects } from "../data/projects";
 import Navigation from "./Navigation";
 import HighlightMark from "./HighlightMark";
 import MobileCarousel from "./MobileCarousel";
+import ContactSection from "./ContactSection";
 
 // ─── Noise Shimmer ────────────────────────────────────────────────────────────
 
@@ -1035,6 +1036,8 @@ export default function CaseStudyPage() {
             </div>
           </div>
         </section>
+
+        <ContactSection />
 
         <div style={{ height: "64px", background: "#faf8f7" }} />
 
