@@ -216,7 +216,7 @@ export default function LightHomepage() {
               <a key={item} href="#" style={{ fontSize: "13px", color: T.text2, textDecoration: "none", fontWeight: 500 }}>{item}</a>
             ))}
             <a
-              href="mailto:sreeharsha@alvyl.com"
+              href="mailto:hpolepeddi@gmail.com"
               style={{
                 fontSize: "13px", fontWeight: 600, padding: "7px 16px", borderRadius: "8px",
                 border: "1px solid rgba(217,119,6,0.30)",
@@ -291,7 +291,7 @@ export default function LightHomepage() {
                 View Case Studies <ArrowRight size={15} />
               </button>
               <a
-                href="mailto:sreeharsha@alvyl.com"
+                href="mailto:hpolepeddi@gmail.com"
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
                   fontSize: "14px", fontWeight: 500, color: T.text2, textDecoration: "none",
@@ -704,7 +704,7 @@ export default function LightHomepage() {
             </p>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
               <a
-                href="mailto:sreeharsha@alvyl.com"
+                href="mailto:hpolepeddi@gmail.com"
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "8px",
                   padding: "13px 24px", borderRadius: "10px",
@@ -742,8 +742,8 @@ export default function LightHomepage() {
           <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.28)", margin: 0 }}>
             UX Design & Product Strategy · {new Date().getFullYear()}
           </p>
-          <a href="mailto:sreeharsha@alvyl.com" style={{ fontSize: "12px", color: "rgba(255,255,255,0.38)", textDecoration: "none" }}>
-            sreeharsha@alvyl.com
+          <a href="mailto:hpolepeddi@gmail.com" style={{ fontSize: "12px", color: "rgba(255,255,255,0.38)", textDecoration: "none" }}>
+            hpolepeddi@gmail.com
           </a>
         </div>
       </footer>

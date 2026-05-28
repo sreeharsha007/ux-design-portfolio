@@ -11,6 +11,11 @@ import HighlightMark from "./HighlightMark";
 import MobileCarousel from "./MobileCarousel";
 import ContactSection from "./ContactSection";
 
+// ─── Feature flags ─────────────────────────────────────────────────────────────
+// Flip to true once project assets, AI design notes, and reflection content
+// are ready. All three sections will reappear automatically.
+const SHOW_WIP_SECTIONS = false;
+
 // ─── Noise Shimmer ────────────────────────────────────────────────────────────
 
 function NoiseShimmer() {
@@ -778,7 +783,7 @@ export default function CaseStudyPage() {
         <div style={{ height: "1px", background: "linear-gradient(to right, transparent, #e7e5e4, transparent)" }} />
 
         {/* ── PROJECT ASSETS ────────────────────────────────────────────────── */}
-        {projectAssets && projectAssets.length > 0 && (
+        {SHOW_WIP_SECTIONS && projectAssets && projectAssets.length > 0 && (
           <section className="py-16 lg:py-32" style={{ background: "#f7f4f1" }}>
             <div className="max-w-[1200px] mx-auto px-6 lg:px-10 mb-12">
               <div className="flex items-end justify-between">
@@ -929,6 +934,7 @@ export default function CaseStudyPage() {
           </section>
         )}
 
+        {SHOW_WIP_SECTIONS && (<>
         {/* Section divider */}
         <div style={{ height: "1px", background: "linear-gradient(to right, transparent, #e7e5e4, transparent)" }} />
 
@@ -1023,19 +1029,22 @@ export default function CaseStudyPage() {
                 </motion.div>
               )}
 
-              <motion.div {...fadeUp(0.26)}>
-                <Link
-                  to="/"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-200 hover:opacity-80"
-                  style={{ background: "#1c1917", color: "white" }}
-                >
-                  <ArrowLeft size={15} />
-                  Back to all work
-                </Link>
-              </motion.div>
             </div>
           </div>
         </section>
+        </>)}
+
+        {/* ── BACK TO ALL WORK — always visible ────────────────────────────── */}
+        <div className="py-14 flex justify-center" style={{ background: "#faf8f7" }}>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-200 hover:opacity-80"
+            style={{ background: "#1c1917", color: "white" }}
+          >
+            <ArrowLeft size={15} />
+            Back to all work
+          </Link>
+        </div>
 
         <ContactSection />
 

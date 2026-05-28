@@ -14,8 +14,15 @@ import { GoogleAuth } from "google-auth-library";
 // ─── ✏️  Edit these constants to change your availability ────────────────────
 // WORKING_DAYS: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
 const WORKING_DAYS  = [0, 1, 2, 3, 4, 5, 6]; // every day of the week
-const START_HOUR    = 7;               // 7:00 AM IST — first slot of the day
-const END_HOUR      = 21;             // 9:00 PM IST — last slot starts at 8:30 PM
+
+// Two daily windows (IST hours, 24-h).
+// start = first slot begins at this hour; end = no slot may START at or after this hour.
+// e.g. { start: 6, end: 10 } → slots at 6:00, 6:30 … 9:30 (last ends at 10:00)
+const TIME_WINDOWS  = [
+  { start:  6, end: 10 },   //  6:00 AM – 10:00 AM IST (morning)
+  { start: 18, end: 23 },   //  6:00 PM – 11:00 PM IST (evening)
+];
+
 const SLOT_MINUTES  = 30;
 const BUFFER_MINS   = 15;             // buffer (mins) padded around existing calendar events
 const DAYS_AHEAD    = 14;             // how many days ahead to expose slots
@@ -101,7 +108,7 @@ function istHour(d: Date): number {
 function jumpToNextISTDay(cursor: Date, daysToAdd: number): void {
   const ist = new Date(cursor.getTime() + IST_OFFSET_MS);
   ist.setUTCDate(ist.getUTCDate() + daysToAdd);
-  ist.setUTCHours(START_HOUR, 0, 0, 0);
+  ist.setUTCHours(TIME_WINDOWS[0].start, 0, 0, 0); // land on the first window's start
   cursor.setTime(ist.getTime() - IST_OFFSET_MS);
 }
 
@@ -123,26 +130,30 @@ function deriveSlots(busy: BusyBlock[], from: Date, until: Date): Slot[] {
   cursor.setSeconds(0, 0);
 
   while (cursor < until) { // no count cap — DAYS_AHEAD is the only limit
-    const dow  = istDay(cursor);
-    const hour = istHour(cursor);
+    const dow     = istDay(cursor);
+    const curHour = istHour(cursor);
 
-    // Skip weekends — jump straight to Monday (or next working day) at START_HOUR IST
+    // Skip non-working days
     if (!WORKING_DAYS.includes(dow)) {
       jumpToNextISTDay(cursor, 1);
       continue;
     }
 
-    // Before working hours — fast-forward to START_HOUR IST (same IST day)
-    if (hour < START_HOUR) {
-      setISTHour(cursor, START_HOUR);
-    }
+    // Find the active window (if any) for the current IST hour
+    const activeWindow = TIME_WINDOWS.find(w => curHour >= w.start && curHour < w.end) ?? null;
 
-    // After working hours — jump to START_HOUR IST on the next IST day
-    if (istHour(cursor) >= END_HOUR) {
-      jumpToNextISTDay(cursor, 1);
+    if (!activeWindow) {
+      // Not inside any window — jump to the next window today, or to tomorrow's first window
+      const nextWindow = TIME_WINDOWS.find(w => w.start > curHour);
+      if (nextWindow) {
+        setISTHour(cursor, nextWindow.start);
+      } else {
+        jumpToNextISTDay(cursor, 1); // past all windows today
+      }
       continue;
     }
 
+    // Inside a window — check for conflicts and emit the slot
     const slotEnd = new Date(cursor.getTime() + SLOT_MINUTES * 60_000);
     const blocked = busy.some(b => {
       const bs = new Date(b.start).getTime() - BUFFER_MINS * 60_000;
@@ -153,7 +164,6 @@ function deriveSlots(busy: BusyBlock[], from: Date, until: Date): Slot[] {
     if (!blocked) {
       slots.push({
         id:     cursor.toISOString(),
-        // Format label/time in IST so they display correctly for Indian visitors
         label:  cursor.toLocaleDateString("en-GB", {
           weekday: "short", day: "numeric", month: "short", timeZone: TIMEZONE,
         }),

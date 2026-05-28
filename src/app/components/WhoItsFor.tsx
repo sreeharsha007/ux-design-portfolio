@@ -802,7 +802,11 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
 
         {/* CTA */}
         <a
-          href="mailto:sreeharsha@alvyl.com"
+          href="/#contact"
+          onClick={(e) => {
+            const el = document.getElementById("contact");
+            if (el) { e.preventDefault(); el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+          }}
           className="group flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-[14px] font-semibold transition-colors"
           style={
             isFeatured

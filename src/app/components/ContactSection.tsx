@@ -136,13 +136,13 @@ function WeekPicker({
     <div className="rounded-xl p-3" style={{ background: "#faf9f8", border: "1px solid #e7e5e4" }}>
 
       {/* Navigation row */}
-      <div className="flex items-center justify-between mb-2.5">
+      <div className="flex items-center justify-center sm:justify-between mb-2.5">
 
-        {/* Month-jump back */}
+        {/* Month-jump back — desktop only */}
         <button
           type="button"
           onClick={() => onWeekChange(jumpToMonth(weekStart, -1))}
-          className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
+          className="hidden sm:flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
         >
           <ChevronLeft className="w-3 h-3" />{prevMonthLabel}
         </button>
@@ -168,11 +168,11 @@ function WeekPicker({
           </button>
         </div>
 
-        {/* Month-jump forward */}
+        {/* Month-jump forward — desktop only */}
         <button
           type="button"
           onClick={() => onWeekChange(jumpToMonth(weekStart, 1))}
-          className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
+          className="hidden sm:flex items-center gap-0.5 px-1.5 py-1 rounded-lg text-[11px] font-semibold text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-all"
         >
           {nextMonthLabel}<ChevronRight className="w-3 h-3" />
         </button>
@@ -402,16 +402,6 @@ export default function ContactSection() {
             >
               Contact
             </p>
-
-            <div
-              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full mb-9"
-              style={{ background: "var(--terra-light)", border: "1px solid var(--terra-border)" }}
-            >
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "var(--terra-500)" }} />
-              <span className="text-[12px] font-semibold" style={{ color: "var(--terra-500)" }}>
-                Available for New Projects
-              </span>
-            </div>
 
             <h2
               className="font-bold tracking-tight leading-tight mb-5"
@@ -780,23 +770,43 @@ export default function ContactSection() {
             </div>
           </motion.div>
 
-          {/* ── Email fallback ─────────────────────────────────────────────── */}
-          <motion.p
+          {/* ── Direct contact options ──────────────────────────────────────── */}
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.15, ease }}
-            className="text-center text-[13px] text-stone-400 mb-14"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-0 mb-14"
           >
-            Or reach me directly at{" "}
+            {/* Email */}
             <a
-              href="mailto:sreeharsha@alvyl.com"
-              className="font-medium transition-colors duration-200 hover:text-stone-600"
+              href="mailto:hpolepeddi@gmail.com"
+              className="flex items-center gap-2 text-[13px] font-medium transition-colors duration-200 hover:text-stone-600"
               style={{ color: "var(--terra-500)" }}
             >
-              sreeharsha@alvyl.com
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+              hpolepeddi@gmail.com
             </a>
-          </motion.p>
+
+            {/* Separator */}
+            <span className="hidden sm:block mx-5 text-stone-300 select-none text-[16px]">|</span>
+            <span className="sm:hidden w-px h-4 bg-stone-200" />
+
+            {/* WhatsApp */}
+            <a
+              href="https://wa.me/919701849481"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[13px] font-medium text-stone-500 transition-colors duration-200 hover:text-stone-700"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0, color: "#25d366" }}>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              WhatsApp
+            </a>
+          </motion.div>
 
 
         </motion.div>
