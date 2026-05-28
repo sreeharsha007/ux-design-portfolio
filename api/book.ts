@@ -54,8 +54,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       start: { dateTime: slotIso, timeZone: TIMEZONE },
       end:   { dateTime: endIso,  timeZone: TIMEZONE },
       attendees: [
-        { email: calendarId, displayName: "Harsha",  responseStatus: "accepted" },
-        { email,             displayName: name,      responseStatus: "needsAction" },
+        // Only add the visitor — the calendar owner is already the organiser
+        // and does not need a separate attendee entry (Google rejects it).
+        { email, displayName: name, responseStatus: "needsAction" },
       ],
       conferenceData: {
         createRequest: {
@@ -72,7 +73,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     };
 
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1&sendUpdates=all`;
+    // sendUpdates=externalOnly → sends a calendar invite email to the visitor
+    // without trying to also notify the organiser's address (which can fail for
+    // personal Gmail calendars managed via a service account).
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1&sendUpdates=externalOnly`;
 
     const gcalRes = await fetch(url, {
       method: "POST",

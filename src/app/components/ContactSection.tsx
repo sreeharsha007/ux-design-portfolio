@@ -326,6 +326,7 @@ export default function ContactSection() {
   const [scheduleOn,    setScheduleOn]    = useState(false);
   const [calendarOpen,  setCalendarOpen]  = useState(false);
   const [submitState,   setSubmitState]   = useState<SubmitState>("idle");
+  const [submitError,   setSubmitError]   = useState<string | null>(null);
 
   // Fetch real slots from /api/slots on mount; fall back to mock if unavailable
   useEffect(() => {
@@ -350,6 +351,9 @@ export default function ContactSection() {
       .finally(() => setSlotsLoading(false));
   }, []);
 
+  // Clear any submit error as soon as the user edits the form
+  useEffect(() => { setSubmitError(null); }, [form]);
+
   const selectSlot = useCallback((slot: Slot) => {
     setSelectedSlot(slot);
     setCalendarOpen(false);
@@ -358,6 +362,7 @@ export default function ContactSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitState("submitting");
+    setSubmitError(null);
     try {
       if (scheduleOn && selectedSlot) {
         // Book the Google Calendar event
@@ -374,12 +379,10 @@ export default function ContactSection() {
         });
         if (!res.ok) throw new Error("Booking failed");
       }
-      // TODO: optionally POST form to Formspree/email relay for message-only path
       setSubmitState("success");
     } catch {
-      // Surface error gently — keep button enabled so user can retry
       setSubmitState("idle");
-      alert("Something went wrong — please try again or email me directly.");
+      setSubmitError("Something went wrong — please try again or email me directly.");
     }
   };
 
@@ -693,6 +696,22 @@ export default function ContactSection() {
                         )}
                       </AnimatePresence>
                     </div>
+
+                    {/* Inline error */}
+                    <AnimatePresence>
+                      {submitError && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-[13px] text-center px-2 py-1 rounded-lg"
+                          style={{ color: "#b91c1c", background: "rgba(185,28,28,0.06)" }}
+                        >
+                          {submitError}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
 
                     {/* Submit */}
                     <motion.button

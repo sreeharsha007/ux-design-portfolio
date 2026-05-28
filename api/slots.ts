@@ -13,13 +13,14 @@ import { GoogleAuth } from "google-auth-library";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const WORKING_DAYS  = [1, 2, 3, 4, 5]; // Mon–Fri
-const START_HOUR    = 9;                // 9:00 AM
-const END_HOUR      = 18;              // 6:00 PM
+const START_HOUR    = 9;                // 9:00 AM IST
+const END_HOUR      = 18;              // 6:00 PM IST
 const SLOT_MINUTES  = 30;
 const BUFFER_MINS   = 15;              // gap around existing events
 const SLOTS_TO_SHOW = 5;
 const DAYS_AHEAD    = 14;
 const TIMEZONE      = "Asia/Kolkata";
+const IST_OFFSET_MS = 5.5 * 60 * 60_000; // UTC+5:30 in milliseconds
 
 interface BusyBlock { start: string; end: string; }
 
@@ -80,6 +81,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+// ─── IST-aware time helpers ───────────────────────────────────────────────────
+// Vercel servers run in UTC. All day/hour checks must be done in IST (UTC+5:30).
+
+/** Returns the day-of-week (0=Sun…6=Sat) for a Date in IST. */
+function istDay(d: Date): number {
+  return new Date(d.getTime() + IST_OFFSET_MS).getUTCDay();
+}
+
+/** Returns the hour (0–23) for a Date in IST. */
+function istHour(d: Date): number {
+  return new Date(d.getTime() + IST_OFFSET_MS).getUTCHours();
+}
+
+/**
+ * Advances cursor to START_HOUR IST on a future IST day.
+ * daysToAdd = 1 → tomorrow's working-day start.
+ */
+function jumpToNextISTDay(cursor: Date, daysToAdd: number): void {
+  const ist = new Date(cursor.getTime() + IST_OFFSET_MS);
+  ist.setUTCDate(ist.getUTCDate() + daysToAdd);
+  ist.setUTCHours(START_HOUR, 0, 0, 0);
+  cursor.setTime(ist.getTime() - IST_OFFSET_MS);
+}
+
+/**
+ * Moves cursor to the given IST hour (minute 0) on the same IST calendar day.
+ * Safe to call only when hour > current IST hour (no backward movement).
+ */
+function setISTHour(cursor: Date, hour: number): void {
+  const ist = new Date(cursor.getTime() + IST_OFFSET_MS);
+  ist.setUTCHours(hour, 0, 0, 0);
+  cursor.setTime(ist.getTime() - IST_OFFSET_MS);
+}
+
 // ─── Derive available slots from busy blocks ──────────────────────────────────
 
 function deriveSlots(busy: BusyBlock[], from: Date, until: Date): Slot[] {
@@ -88,19 +123,23 @@ function deriveSlots(busy: BusyBlock[], from: Date, until: Date): Slot[] {
   cursor.setSeconds(0, 0);
 
   while (cursor < until && slots.length < 20) {
-    const dow = cursor.getDay();
+    const dow  = istDay(cursor);
+    const hour = istHour(cursor);
 
+    // Skip weekends — jump straight to Monday (or next working day) at START_HOUR IST
     if (!WORKING_DAYS.includes(dow)) {
-      cursor.setDate(cursor.getDate() + 1);
-      cursor.setHours(START_HOUR, 0, 0, 0);
+      jumpToNextISTDay(cursor, 1);
       continue;
     }
-    if (cursor.getHours() < START_HOUR) {
-      cursor.setHours(START_HOUR, 0, 0, 0);
+
+    // Before working hours — fast-forward to START_HOUR IST (same IST day)
+    if (hour < START_HOUR) {
+      setISTHour(cursor, START_HOUR);
     }
-    if (cursor.getHours() >= END_HOUR) {
-      cursor.setDate(cursor.getDate() + 1);
-      cursor.setHours(START_HOUR, 0, 0, 0);
+
+    // After working hours — jump to START_HOUR IST on the next IST day
+    if (istHour(cursor) >= END_HOUR) {
+      jumpToNextISTDay(cursor, 1);
       continue;
     }
 
@@ -114,8 +153,13 @@ function deriveSlots(busy: BusyBlock[], from: Date, until: Date): Slot[] {
     if (!blocked) {
       slots.push({
         id:     cursor.toISOString(),
-        label:  cursor.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }),
-        time:   cursor.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+        // Format label/time in IST so they display correctly for Indian visitors
+        label:  cursor.toLocaleDateString("en-GB", {
+          weekday: "short", day: "numeric", month: "short", timeZone: TIMEZONE,
+        }),
+        time:   cursor.toLocaleTimeString("en-US", {
+          hour: "numeric", minute: "2-digit", timeZone: TIMEZONE,
+        }),
         iso:    cursor.toISOString(),
         endIso: slotEnd.toISOString(),
       });
