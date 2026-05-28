@@ -17,7 +17,7 @@ const START_HOUR    = 9;                // 9:00 AM IST
 const END_HOUR      = 18;              // 6:00 PM IST
 const SLOT_MINUTES  = 30;
 const BUFFER_MINS   = 15;              // gap around existing events
-const SLOTS_TO_SHOW = 5;
+const SLOTS_TO_SHOW = 20; // return up to 20 so the calendar can highlight many days
 const DAYS_AHEAD    = 14;
 const TIMEZONE      = "Asia/Kolkata";
 const IST_OFFSET_MS = 5.5 * 60 * 60_000; // UTC+5:30 in milliseconds
@@ -70,7 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const fb   = await fbRes.json();
     const busy: BusyBlock[] = fb.calendars?.[process.env.GOOGLE_CALENDAR_ID!]?.busy ?? [];
-    const slots = deriveSlots(busy, now, until).slice(0, SLOTS_TO_SHOW);
+    const slots = deriveSlots(busy, now, until); // already capped at SLOTS_TO_SHOW inside deriveSlots
 
     res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate"); // cache 5 min
     return res.status(200).json({ slots });

@@ -49,34 +49,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       description: [
         "30-min discovery call booked via portfolio site.",
         "",
-        message ? `Project brief:\n${message}` : "",
+        `Name: ${name}`,
+        `Email: ${email}`,
+        message ? `\nProject brief:\n${message}` : "",
       ].filter(Boolean).join("\n"),
       start: { dateTime: slotIso, timeZone: TIMEZONE },
       end:   { dateTime: endIso,  timeZone: TIMEZONE },
+      // Visitor gets a calendar invite; the organiser (Harsha) sees it via the
+      // calendar the service account has write-access to.
+      // NOTE: conferenceData (Meet link) is intentionally omitted — Meet link
+      // creation via API requires Google Workspace, not personal Gmail.
       attendees: [
-        // Only add the visitor — the calendar owner is already the organiser
-        // and does not need a separate attendee entry (Google rejects it).
-        { email, displayName: name, responseStatus: "needsAction" },
+        { email, displayName: name },
       ],
-      conferenceData: {
-        createRequest: {
-          requestId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          conferenceSolutionKey: { type: "hangoutsMeet" },
-        },
-      },
-      reminders: {
-        useDefault: false,
-        overrides: [
-          { method: "email", minutes: 1440 }, // 24h before
-          { method: "popup", minutes: 15    },
-        ],
-      },
     };
 
-    // sendUpdates=externalOnly → sends a calendar invite email to the visitor
-    // without trying to also notify the organiser's address (which can fail for
-    // personal Gmail calendars managed via a service account).
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1&sendUpdates=externalOnly`;
+    // sendUpdates=all → Google sends a calendar invite email to the visitor.
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?sendUpdates=all`;
 
     const gcalRes = await fetch(url, {
       method: "POST",
@@ -85,16 +74,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (!gcalRes.ok) {
-      const err = await gcalRes.text();
-      console.error("Google Calendar create error:", err);
-      return res.status(500).json({ error: "Failed to create calendar event" });
+      const errText = await gcalRes.text();
+      console.error("Google Calendar create error:", gcalRes.status, errText);
+      // Return Google's error detail so it's visible in the inline UI during debugging
+      return res.status(500).json({
+        error: "Failed to create calendar event",
+        detail: errText,
+      });
     }
 
     const created = await gcalRes.json();
     return res.status(200).json({
       success:   true,
       eventId:   created.id,
-      meetLink:  created.conferenceData?.entryPoints?.[0]?.uri ?? null,
       eventLink: created.htmlLink ?? null,
     });
 

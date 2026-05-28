@@ -377,12 +377,17 @@ export default function ContactSection() {
             endIso:  selectedSlot.endIso,
           }),
         });
-        if (!res.ok) throw new Error("Booking failed");
+        if (!res.ok) {
+          // Capture Google's error detail so it's visible in the UI for debugging
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.detail ?? body.error ?? "Booking failed");
+        }
       }
       setSubmitState("success");
-    } catch {
+    } catch (err: unknown) {
       setSubmitState("idle");
-      setSubmitError("Something went wrong — please try again or email me directly.");
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setSubmitError(`Booking failed: ${msg}`);
     }
   };
 
@@ -634,7 +639,7 @@ export default function ContactSection() {
                             exit={{ opacity: 0, y: -4 }}
                             transition={{ duration: 0.22, ease }}
                           >
-                            {/* Slot chips */}
+                            {/* Slot chips — show first 5 only; full list goes to the calendar */}
                             <div className="flex flex-wrap gap-2 mb-3">
                               {slotsLoading
                                 ? Array.from({ length: 3 }).map((_, i) => (
@@ -644,7 +649,7 @@ export default function ContactSection() {
                                       style={{ width: i === 0 ? 148 : i === 1 ? 130 : 148, background: "#f0ede9" }}
                                     />
                                   ))
-                                : slots.map(slot => (
+                                : slots.slice(0, 5).map(slot => (
                                 <SlotChip
                                   key={slot.id}
                                   slot={slot}
