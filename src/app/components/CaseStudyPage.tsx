@@ -1034,18 +1034,6 @@ export default function CaseStudyPage() {
         </section>
         </>)}
 
-        {/* ── BACK TO ALL WORK — always visible ────────────────────────────── */}
-        <div className="py-14 flex justify-center" style={{ background: "#faf8f7" }}>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[14px] font-semibold tracking-wide transition-all duration-200 hover:opacity-80"
-            style={{ background: "#1c1917", color: "white" }}
-          >
-            <ArrowLeft size={15} />
-            Back to all work
-          </Link>
-        </div>
-
         <ContactSection />
 
         <div style={{ height: "64px", background: "#faf8f7" }} />
