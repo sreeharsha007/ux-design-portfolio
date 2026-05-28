@@ -710,7 +710,6 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.55, delay: cardDelay, ease: [0.22, 1, 0.36, 1] }}
         onMouseEnter={() => setCardHover(true)}
         onMouseLeave={() => setCardHover(false)}
         className={`relative flex flex-col rounded-[20px] h-full ${
@@ -735,8 +734,11 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
         }
         transition={
           isFeatured
-            ? { boxShadow: { duration: 2.8, repeat: Infinity, ease: "easeInOut" } }
-            : undefined
+            ? {
+                default: { duration: 0.55, delay: cardDelay, ease: [0.22, 1, 0.36, 1] },
+                boxShadow: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
+              }
+            : { duration: 0.55, delay: cardDelay, ease: [0.22, 1, 0.36, 1] }
         }
       >
         {/* Top row: badge on the left, glyph on the right */}
