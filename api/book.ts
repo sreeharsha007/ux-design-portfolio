@@ -55,7 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ].filter(Boolean).join("\n"),
       start: { dateTime: slotIso, timeZone: TIMEZONE },
       end:   { dateTime: endIso,  timeZone: TIMEZONE },
-      attendees: [{ email }],
+      attendees: [{ email }, { email: process.env.GOOGLE_CALENDAR_ID }],
       conferenceData: {
         createRequest: {
           requestId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
