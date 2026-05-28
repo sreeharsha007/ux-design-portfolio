@@ -3,13 +3,14 @@
  * Returns the next available 30-min slots from Google Calendar (Freebusy API).
  *
  * Env vars required (set in Vercel dashboard + .env.local for local dev):
- *   GOOGLE_SERVICE_ACCOUNT_EMAIL
- *   GOOGLE_PRIVATE_KEY
+ *   GOOGLE_OAUTH_CLIENT_ID
+ *   GOOGLE_OAUTH_CLIENT_SECRET
+ *   GOOGLE_OAUTH_REFRESH_TOKEN
  *   GOOGLE_CALENDAR_ID
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { GoogleAuth } from "google-auth-library";
+import { OAuth2Client } from "google-auth-library";
 
 // ─── ✏️  Edit these constants to change your availability ────────────────────
 // WORKING_DAYS: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
@@ -17,9 +18,9 @@ const WORKING_DAYS  = [0, 1, 2, 3, 4, 5, 6]; // every day of the week
 
 // Two daily windows (IST hours, 24-h).
 // start = first slot begins at this hour; end = no slot may START at or after this hour.
-// e.g. { start: 6, end: 10 } → slots at 6:00, 6:30 … 9:30 (last ends at 10:00)
+// e.g. { start: 6, end: 11 } → slots at 6:00, 6:30 … 10:30 (last ends at 11:00)
 const TIME_WINDOWS  = [
-  { start:  6, end: 10 },   //  6:00 AM – 10:00 AM IST (morning)
+  { start:  6, end: 11 },   //  6:00 AM – 11:00 AM IST (morning)
   { start: 18, end: 23 },   //  6:00 PM – 11:00 PM IST (evening)
 ];
 
@@ -43,17 +44,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const auth = new GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key:  process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      },
-      scopes: ["https://www.googleapis.com/auth/calendar.readonly"],
+    const oauth2Client = new OAuth2Client(
+      process.env.GOOGLE_OAUTH_CLIENT_ID,
+      process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+    );
+
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN,
     });
 
-    const client      = await auth.getClient();
-    const tokenResult = await (client as any).getAccessToken();
-    const token       = tokenResult.token as string;
+    const { token } = await oauth2Client.getAccessToken();
 
     const now   = new Date();
     const until = new Date(now.getTime() + DAYS_AHEAD * 86_400_000);
