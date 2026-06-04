@@ -43,6 +43,16 @@ export interface LearningItem {
   detail: string;
 }
 
+export interface Testimonial {
+  quote: string;
+  highlightText?: string;
+  highlightParts?: string[];
+  role: string;
+  company: string;
+  location: string;
+  rating: number;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -73,6 +83,7 @@ export interface Project {
   reflection?: string;
   projectAssets?: ProjectAsset[];
   nextPhase?: string[];
+  testimonial?: Testimonial;
 }
 
 export const projects: Project[] = [
@@ -194,6 +205,14 @@ export const projects: Project[] = [
         caption: "System view — scalable design foundations supporting consistency as the platform grows.",
       },
     ],
+    testimonial: {
+      quote: "Harsha helped us see our problem was organizational clarity, not technology. His RCA canvas made ownership visible — incident response cycles cut in half, adoption jumped to 94%. Investors saw this as a differentiator: we weren't just faster, we were building preventive intelligence. That capability shift became core to our growth story.",
+      highlightParts: ["incident response cycles cut in half,", "adoption jumped to 94%."],
+      role: "CISO",
+      company: "Series B Security Company",
+      location: "California",
+      rating: 5,
+    },
   },
   {
     id: "neural-insights",
@@ -300,7 +319,15 @@ export const projects: Project[] = [
       { title: "Progressive disclosure beats simplification", detail: "Hiding complexity for experts broke their workflow. Revealing complexity on demand preserved both audiences." },
       { title: "Business language is a design decision", detail: "Naming metrics in money and risk terms wasn't copywriting — it was a framing choice that shaped every chart." },
       { title: "Test with the real decision, not the interface", detail: "Tree tests and 5-second tests missed the real question — we switched to 'what would you do next?' tasks and got honest data." },
-    ]
+    ],
+    testimonial: {
+      quote: "Harsha didn't impose a solution — he ran workshops with our domain engineers to understand what made them confident. The design that shipped came from their thinking. Operators didn't just adopt it; they started thinking differently about diagnostics. They're faster, better at their jobs, teaching each other new patterns. That capability shift is the real ROI.",
+      highlightText: "That capability shift is the real ROI",
+      role: "VP of Engineering",
+      company: "Industrial SaaS",
+      location: "Texas",
+      rating: 5,
+    },
   },
   {
     id: "adaptive-mobile",

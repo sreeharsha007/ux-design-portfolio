@@ -70,9 +70,10 @@ function NoiseShimmer() {
 // ─── World Map ────────────────────────────────────────────────────────────────
 
 const MAP_MARKERS = [
-  { x: 128, y: 122, label: "San Francisco, CA" },
-  { x: 401, y: 104, label: "London, UK" },
-  { x: 572, y: 148, label: "Bangalore, India" },
+  { x: 85, y: 135, label: "California" },
+  { x: 210, y: 135, label: "Texas" },
+  { x: 250, y: 125, label: "New York" },
+  { x: 550, y: 195, label: "Hyderabad, India" },
 ];
 
 function WorldMap({ activeIndex }: { activeIndex: number }) {
@@ -118,27 +119,11 @@ function WorldMap({ activeIndex }: { activeIndex: number }) {
           <polygon points="374,98 385,88 394,92 392,108 380,114 372,108" />
         </g>
 
-        {/* Connection arcs between markers */}
-        {MAP_MARKERS.map((m, i) => {
-          const next = MAP_MARKERS[(i + 1) % MAP_MARKERS.length];
-          const mx = (m.x + next.x) / 2;
-          const my = Math.min(m.y, next.y) - 30;
-          return (
-            <path
-              key={i}
-              d={`M ${m.x} ${m.y} Q ${mx} ${my} ${next.x} ${next.y}`}
-              fill="none"
-              stroke={i === activeIndex ? "rgba(196,82,42,0.28)" : "rgba(196,82,42,0.08)"}
-              strokeWidth={i === activeIndex ? 1.5 : 0.75}
-              strokeDasharray="4 3"
-            />
-          );
-        })}
       </svg>
 
       {/* Markers */}
       {MAP_MARKERS.map((marker, i) => {
-        const isActive = i === activeIndex;
+        const isActive = activeIndex === 2 ? (i === 2 || i === 3) : (i === activeIndex);
         return (
           <div
             key={i}
@@ -274,27 +259,24 @@ const LAYER_GRADIENTS = [
 
 const TESTIMONIALS = [
   {
-    quote: "Delivered a full design system in 8 weeks that our previous agency quoted 6 months for. The quality was exceptional and the handoff was the cleanest we've ever received.",
-    name: "Sarah Kim",
-    role: "VP of Product",
-    company: "Series B SaaS",
-    location: "San Francisco, CA",
+    quote: "Harsha helped us see our problem was organizational clarity, not technology. His RCA canvas made ownership visible — incident response cycles cut in half, adoption jumped to 94%. Investors saw this as a differentiator: we weren't just faster, we were building preventive intelligence. That capability shift became core to our growth story.",
+    role: "CISO",
+    company: "Series B Security Company",
+    location: "California",
     rating: 5,
   },
   {
-    quote: "What stood out was the speed without sacrificing depth. We had a usability-tested, dev-ready prototype for our investor demo in 3 weeks. Highly recommend.",
-    name: "Marcus Osei",
-    role: "Co-founder & CEO",
-    company: "FinTech Startup",
-    location: "London, UK",
+    quote: "Harsha didn't impose a solution — he ran workshops with our domain engineers to understand what made them confident. The design that shipped came from their thinking. Operators didn't just adopt it; they started thinking differently about diagnostics. They're faster, better at their jobs, teaching each other new patterns. That capability shift is the real ROI.",
+    role: "VP of Engineering",
+    company: "Industrial SaaS",
+    location: "Texas",
     rating: 5,
   },
   {
-    quote: "Finally a designer who understands enterprise constraints. The AI workflow breakdowns in every deliverable helped our team understand the decisions — not just the output.",
-    name: "Priya Nair",
-    role: "Director of UX",
-    company: "Enterprise Healthcare",
-    location: "Bangalore, India",
+    quote: "We thought our problem was customer experience. Harsha showed us the real bottleneck: how we coordinated internally. He mapped the team's actual workflow, redesigned around it, and freed up 40% of wasted time. Advisors got their time back. Revenue per advisor jumped 35% in year one. Now we're scaling Priya's expertise across the team.",
+    role: "Managing Partner",
+    company: "Tax Advisory Firm",
+    location: "New York & Hyderabad, India",
     rating: 5,
   },
 ];
@@ -1320,7 +1302,7 @@ export default function Homepage() {
               const isActive = i === activeTestimonial;
               return (
                 <motion.button
-                  key={t.name}
+                  key={i}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -1348,14 +1330,13 @@ export default function Homepage() {
                   {/* Stars */}
                   <div className="flex gap-0.5">
                     {[...Array(t.rating)].map((_, j) => (
-                      <Star key={j} className="w-3 h-3" fill={isActive ? "var(--terra-500)" : "#d6d3d1"} style={{ color: isActive ? "var(--terra-500)" : "#d6d3d1" }} />
+                      <Star key={j} className="w-3 h-3" fill="var(--terra-500)" style={{ color: "var(--terra-500)" }} />
                     ))}
                   </div>
 
                   {/* Attribution */}
                   <div className="flex items-center gap-3 pt-3" style={{ borderTop: `1px solid ${isActive ? "#e7e5e4" : "#ece9e6"}` }}>
                     <div>
-                      <div className="text-[14px] font-semibold text-stone-800">{t.name}</div>
                       <div className="text-[12px] text-stone-500">{t.role} · {t.company}</div>
                       <div className="text-[12px] mt-0.5" style={{ color: isActive ? "var(--terra-500)" : "#78716c" }}>{t.location}</div>
                     </div>
@@ -1382,7 +1363,7 @@ export default function Homepage() {
                 const isActive = i === activeTestimonial;
                 return (
                   <div
-                    key={t.name}
+                    key={i}
                     className="h-full p-7 rounded-2xl flex flex-col gap-4 transition-all duration-300"
                     style={{
                       background: isActive ? "#ffffff" : "rgba(255,255,255,0.5)",
@@ -1413,8 +1394,8 @@ export default function Homepage() {
                         <Star
                           key={j}
                           className="w-3 h-3"
-                          fill={isActive ? "var(--terra-500)" : "#d6d3d1"}
-                          style={{ color: isActive ? "var(--terra-500)" : "#d6d3d1" }}
+                          fill="var(--terra-500)"
+                          style={{ color: "var(--terra-500)" }}
                         />
                       ))}
                     </div>
@@ -1425,7 +1406,6 @@ export default function Homepage() {
                       style={{ borderTop: `1px solid ${isActive ? "#e7e5e4" : "#ece9e6"}` }}
                     >
                       <div>
-                        <div className="text-[14px] font-semibold text-stone-800">{t.name}</div>
                         <div className="text-[12px] text-stone-500">{t.role} · {t.company}</div>
                         <div
                           className="text-[12px] mt-0.5"

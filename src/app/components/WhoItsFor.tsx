@@ -17,6 +17,7 @@ import {
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
+import TooltipIcon from "./TooltipIcon";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -675,7 +676,7 @@ function AiOutcomeRow({
           <span style={{ position: "relative", zIndex: 1 }}>{title}</span>
           <HighlighterBrush active={highlight} variantIndex={variantIndex} />
         </div>
-        <AiAssistedTag />
+        <TooltipIcon text={detail} />
       </div>
       <div
         className="text-[12.5px] leading-[1.45] mt-1"

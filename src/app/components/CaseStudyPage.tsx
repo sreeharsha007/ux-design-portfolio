@@ -10,6 +10,7 @@ import Navigation from "./Navigation";
 import HighlightMark from "./HighlightMark";
 import MobileCarousel from "./MobileCarousel";
 import ContactSection from "./ContactSection";
+import CaseStudyTestimonial from "./CaseStudyTestimonial";
 
 // ─── Feature flags ─────────────────────────────────────────────────────────────
 // Flip to true once project assets, AI design notes, and reflection content
@@ -1033,6 +1034,10 @@ export default function CaseStudyPage() {
           </div>
         </section>
         </>)}
+
+        {project?.testimonial && (
+          <CaseStudyTestimonial {...project.testimonial} />
+        )}
 
         <ContactSection />
 

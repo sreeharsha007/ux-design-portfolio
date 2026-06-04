@@ -14,7 +14,7 @@ export default function HighlightMark({
   delay?: number;
 }) {
   return (
-    <span style={{ position: "relative", display: "inline-block", whiteSpace: "nowrap" }}>
+    <span style={{ position: "relative", display: "inline", whiteSpace: "normal" }}>
       <svg
         aria-hidden="true"
         style={{
