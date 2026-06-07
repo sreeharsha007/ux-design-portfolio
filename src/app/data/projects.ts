@@ -216,7 +216,7 @@ export const projects: Project[] = [
   },
   {
     id: "neural-insights",
-    title: "Pipeline operations were information-rich, but not decision-friendly.",
+    title: "AI-Assisted Pipeline Operations Platform",
     category: "Data Visualization",
     description: "I helped shape a modern operational platform that made complex pipeline workflows across design, monitoring, and diagnostics more visual, usable, and actionable — without losing the rigor required in industrial environments.",
     image: "https://images.unsplash.com/photo-1752253604157-65fb42c30816?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsJTIwZnV0dXJpc3RpYyUyMGludGVyZmFjZSUyMGRlc2lnbnxlbnwxfHx8fDE3NzIxMDUxNjF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",

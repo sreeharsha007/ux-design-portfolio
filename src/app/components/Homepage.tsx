@@ -1434,7 +1434,7 @@ export default function Homepage() {
               More verified client reviews available on my Upwork profile.
             </p>
             <a
-              href="https://upwork.com"
+              href="https://www.upwork.com/freelancers/~01b9da5c9a45dd5007?mp_source=share"
               target="_blank"
               rel="noopener noreferrer"
               className="self-start inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200"
