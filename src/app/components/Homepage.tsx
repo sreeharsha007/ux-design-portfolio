@@ -647,9 +647,8 @@ function MobileScrollCue() {
 export default function Homepage() {
   const featuredProject = projects[0];
   const moreProjects = projects.slice(1);
-  // ↑ Change slice(0, 1) → slice(0, 2) below when the 3rd project is ready to publish.
   // The layout switches automatically: 1 secondary = featured-card width; 2+ = grid/carousel.
-  const visibleSecondary = moreProjects.slice(0, 1);
+  const visibleSecondary = moreProjects.slice(0, 4);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [pauseAutoRotate, setPauseAutoRotate] = useState(false);
@@ -1138,12 +1137,16 @@ export default function Homepage() {
                 style={{ border: "1px solid #e7e5e4" }}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2">
-                  {visibleSecondary.slice(0, 2).map((project, i) => (
+                  {visibleSecondary.slice(0, 4).map((project, i) => (
                     <Link
                       key={project.id}
                       to={`/case-study/${project.id}`}
                       className="group cursor-pointer flex flex-col"
-                      style={{ borderLeft: i > 0 ? "1px solid #ece8e6" : undefined, textDecoration: "none" }}
+                      style={{
+                        borderLeft: i % 2 === 1 ? "1px solid #ece8e6" : undefined,
+                        borderTop: i >= 2 ? "1px solid #ece8e6" : undefined,
+                        textDecoration: "none",
+                      }}
                     >
                       <div className="relative" style={{ height: "300px" }}>
                         <motion.div
@@ -1184,7 +1187,7 @@ export default function Homepage() {
               {/* ── Mobile: swipe carousel ── */}
               <div className="lg:hidden -mx-6">
                 <MobileCarousel cardWidthPercent={86} gap={14} snap="center" ariaLabel="More case studies">
-                  {visibleSecondary.slice(0, 2).map((project, i) => (
+                  {visibleSecondary.slice(0, 4).map((project, i) => (
                     <Link
                       key={project.id}
                       to={`/case-study/${project.id}`}

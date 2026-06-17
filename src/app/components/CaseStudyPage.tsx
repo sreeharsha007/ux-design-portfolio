@@ -284,7 +284,7 @@ export default function CaseStudyPage() {
     );
   }
 
-  const { title, category, role, timeline, industry, tagline, heroImage, contextImage, context, contextPoints, keyDecisions, impactItems, projectAssets, aiDesignNote, nextPhase, reflection } = project;
+  const { title, category, role, timeline, industry, tagline, heroImage, heroFit, contextImage, context, contextPoints, keyDecisions, decisionCategories, impactItems, projectAssets, aiDesignNote, nextPhase, reflection } = project;
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "var(--font-body, system-ui)" }}>
@@ -369,7 +369,7 @@ export default function CaseStudyPage() {
                 className="block lg:hidden w-full h-auto"
               />
 
-              {/* DESKTOP — original cropped + parallax treatment */}
+              {/* DESKTOP — fixed-height parallax + cover */}
               <div ref={heroRef} className="hidden lg:block relative" style={{ height: "clamp(340px, 50vw, 500px)" }}>
                 <motion.div
                   initial={{ scale: 1.08 }}
@@ -381,8 +381,8 @@ export default function CaseStudyPage() {
                   <img
                     src={heroImage ?? "/Featured Project Hero Image.png"}
                     alt={title}
-                    className="w-full h-full object-cover"
-                    style={{ objectPosition: "center top" }}
+                    className={`w-full h-full ${heroFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+                    style={{ objectPosition: heroFit === 'contain' ? 'center center' : 'center top' }}
                   />
                 </motion.div>
               </div>
@@ -478,6 +478,7 @@ export default function CaseStudyPage() {
               {(() => {
                 const meta = DECISION_META[0];
                 const { Icon } = meta;
+                const categoryLabel = decisionCategories?.[0] ?? meta.category;
                 return (
                   <motion.div
                     {...fadeUp(0.08)}
@@ -513,7 +514,7 @@ export default function CaseStudyPage() {
                       <div className="flex items-center gap-2.5 mb-5">
                         <Icon size={18} style={{ color: "var(--terra-500)" }} strokeWidth={1.75} />
                         <span className="text-[11px] font-bold tracking-[0.1em] uppercase" style={{ color: "var(--terra-500)" }}>
-                          {meta.category}
+                          {categoryLabel}
                         </span>
                       </div>
                       <h3
@@ -548,6 +549,7 @@ export default function CaseStudyPage() {
                   {keyDecisions.slice(1).map((decision, i) => {
                     const meta = DECISION_META[i + 1] ?? DECISION_META[0];
                     const { Icon } = meta;
+                    const categoryLabel = decisionCategories?.[i + 1] ?? meta.category;
                     // Internal dividers only — no outer borders (handled by wrapper)
                     const dividerClass = [
                       "border-b border-[#ece8e6] sm:border-r",
@@ -592,7 +594,7 @@ export default function CaseStudyPage() {
                           <div className="flex items-center gap-2">
                             <Icon size={15} style={{ color: "var(--terra-500)" }} strokeWidth={1.75} />
                             <span className="text-[10px] font-bold tracking-[0.1em] uppercase" style={{ color: "var(--terra-500)" }}>
-                              {meta.category}
+                              {categoryLabel}
                             </span>
                           </div>
                           <h3
@@ -639,6 +641,7 @@ export default function CaseStudyPage() {
                   {keyDecisions.slice(1).map((decision, i) => {
                     const meta = DECISION_META[i + 1] ?? DECISION_META[0];
                     const { Icon } = meta;
+                    const categoryLabel = decisionCategories?.[i + 1] ?? meta.category;
                     const imgSrc =
                       decision.image ??
                       (i === 0 ? "/Final Deep Navigation.png" :
@@ -667,7 +670,7 @@ export default function CaseStudyPage() {
                           <div className="flex items-center gap-2">
                             <Icon size={15} style={{ color: "var(--terra-500)" }} strokeWidth={1.75} />
                             <span className="text-[10px] font-bold tracking-[0.1em] uppercase" style={{ color: "var(--terra-500)" }}>
-                              {meta.category}
+                              {categoryLabel}
                             </span>
                           </div>
                           <h3

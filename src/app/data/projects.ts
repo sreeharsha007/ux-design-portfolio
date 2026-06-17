@@ -72,10 +72,12 @@ export interface Project {
   processTimeline: ProcessTimelineStep[];
   tagline?: string;
   heroImage?: string;
+  heroFit?: 'cover' | 'contain';
   contextImage?: string;
   context?: string;
   contextPoints?: ContextPoint[];
   keyDecisions?: KeyDecision[];
+  decisionCategories?: string[];
   impactItems?: ImpactItem[];
   aiInProject?: AIInProject;
   learnings?: LearningItem[];
@@ -330,214 +332,292 @@ export const projects: Project[] = [
     },
   },
   {
-    id: "adaptive-mobile",
-    title: "Context-Aware Mobile App",
-    category: "Mobile Design",
-    description: "A context-aware mobile interface that adapts its layout, density, and interaction patterns based on user behaviour and environment — improving usability in real-world conditions that lab testing misses.",
-    image: "https://images.unsplash.com/photo-1713857297379-6fc26e70f581?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBtb2JpbGUlMjBhcHAlMjBpbnRlcmZhY2V8ZW58MXx8fHwxNzcxOTg4MTg0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    role: "Lead Product Designer",
-    timeline: "10 months (2024–2025)",
-    industry: "Consumer Mobile / Logistics",
-    clientSize: "Scale-up (Series C)",
-    problem: "Field workers using the app in variable conditions — low light, gloves, moving vehicles — reported high error rates and task abandonment. The one-size-fits-all interface optimised for desktop-tested scenarios was failing the people who used it most.",
-    solution: "Designed an adaptive interface system that reads environmental signals (ambient light, motion, connectivity) and adjusts tap target sizes, contrast ratios, and information density in real time. Introduced a simplified 'field mode' that surfaces only the 3 most-needed actions based on time-of-day and usage patterns.",
+    id: "case-study-3",
+    title: "Transforming B2B E-Commerce Operations Through a Unified SaaS Ecosystem",
+    category: "B2B E-Commerce",
+    description: "A product ecosystem designed to simplify B2B commerce operations, improve admin efficiency, and help teams manage storefronts, workflows, integrations, and account operations from one connected platform.",
+    image: "https://images.unsplash.com/photo-1752253604157-65fb42c30816?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsJTIwZnV0dXJpc3RpYyUyMGludGVyZmFjZSUyMGRlc2lnbnxlbnwxfHx8fDE3NzIxMDUxNjF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    role: "Head of Product Design",
+    timeline: "6 months (2025)",
+    industry: "Enterprise SaaS / AI Tooling",
+    clientSize: "Enterprise (250+ employees)",
+    problem: "Business leaders needed to track AI model performance but lacked the technical context to interpret raw metrics. The existing dashboard was built for data engineers — it overwhelmed non-technical users and led to constant escalations to the data team for basic questions.",
+    solution: "Designed a progressive disclosure dashboard that adapts its complexity to the viewer's role. Executives see business-impact summaries; data teams get granular controls. Custom visualizations translate technical metrics into revenue and risk language, with contextual tooltips that teach rather than just label.",
     outcomes: [
-      "45% improvement in task completion rates in low-light conditions",
-      "78% reduction in accidental taps during motion (field testing)",
-      "4.7/5 average rating from field workers in post-launch survey",
-      "30% increase in daily active usage within 60 days of launch"
+      "85% of non-technical users correctly interpreted model performance in usability testing",
+      "60% decrease in data team support tickets within 8 weeks of launch",
+      "3x increase in weekly active usage among leadership team",
+      "Average time-to-decision reduced from 4 days to same-day"
     ],
-    technologies: ["React Native", "TensorFlow Lite", "Device Sensors API", "Expo", "Figma"],
+    technologies: ["D3.js", "WebGL", "React", "Python / FastAPI", "WebSockets"],
     deliverables: [
-      "Adaptive UI specification document",
-      "React Native component library (Figma + code)",
-      "Field mode interaction prototype",
-      "Environmental trigger logic documentation",
-      "Accessibility audit + WCAG compliance report"
+      "High-fidelity Figma prototype (desktop + tablet)",
+      "Role-based view specifications (Executive / Analyst / Engineer)",
+      "Custom data visualization component library",
+      "Onboarding flow design",
+      "UX research report with usability test findings"
     ],
     aiWorkflow: [
       {
-        phase: "Field Research Synthesis",
-        tool: "Claude + Otter.ai",
-        impact: "Transcribed and synthesised 20+ field interviews in 1 day vs. 1.5 weeks"
+        phase: "User Research",
+        tool: "Claude + Dovetail AI",
+        impact: "Analyzed 15 stakeholder interviews and 6 months of support tickets in 4 hours"
       },
       {
-        phase: "Scenario Mapping",
-        tool: "GPT-4",
-        impact: "Generated 40 edge-case usage scenarios in 2 hours to stress-test designs"
+        phase: "Information Architecture",
+        tool: "GPT-4 + FigJam AI",
+        impact: "Generated and evaluated 8 IA structures in 1 day vs. 1 week of workshops"
       },
       {
-        phase: "Visual Exploration",
-        tool: "Midjourney",
-        impact: "Produced high-contrast UI mood boards for 3 environment modes in 3 hours"
+        phase: "Chart Design",
+        tool: "Midjourney + manual Figma work",
+        impact: "Produced 20 visualization concepts in a half-day for stakeholder review"
       },
       {
-        phase: "Prototype Copy",
+        phase: "Copy & Tooltips",
         tool: "Claude",
-        impact: "Drafted all microcopy for adaptive state transitions — 60+ strings — in under an hour"
+        impact: "Wrote plain-language explanations for 40+ technical metrics in 2 hours"
       }
     ],
     processTimeline: [
       {
         phase: "Discovery",
-        duration: "Week 1–3",
-        description: "Conducted 20 field observations across 4 locations, analysed crash logs and error patterns"
+        duration: "Week 1–2",
+        description: "Shadowed 6 user sessions, reviewed support ticket patterns, mapped decision-making workflows"
       },
       {
         phase: "Define",
-        duration: "Week 4–5",
-        description: "Defined environmental trigger logic, created adaptive behaviour matrix, aligned with mobile engineering"
+        duration: "Week 3",
+        description: "Defined 3 user personas, prioritised metrics by business impact, aligned with engineering on data availability"
       },
       {
         phase: "Design",
-        duration: "Week 6–14",
-        description: "Designed 3 adaptive states, built React Native prototype, ran 3 rounds of field usability testing"
+        duration: "Week 4–9",
+        description: "Iterated on IA, built interactive prototype, ran 2 rounds of usability testing with 5 participants each"
       },
       {
         phase: "Deliver",
-        duration: "Week 15–16",
-        description: "Full spec handoff, component library documentation, engineer onboarding and QA support"
+        duration: "Week 10–11",
+        description: "Final handoff with annotated specs, edge case documentation, and a live walkthrough with the engineering team"
       }
     ],
-    tagline: "An interface that adapts to the real world — not the lab it was tested in.",
-    context: "Field workers in logistics used the app in conditions the design team never saw: dim warehouses, cold-storage gloves, moving trucks. Task abandonment spiked outside business hours, and the support inbox filled with 'accidental tap' complaints. A one-size interface was failing the people the product existed for.",
+    tagline: "A product ecosystem designed to simplify B2B commerce operations, improve admin efficiency, and help teams manage storefronts, workflows, integrations, and account operations from one connected platform.",
+    heroImage: "/P3 - Hero.png",
+    heroFit: "contain",
+    contextImage: "/P3 - Context and Problems.png",
+    context: "This project focused on shaping a unified SaaS ecosystem for B2B e-commerce operations. The platform needed to support multiple operational layers — from admin management and storefront control to scheduling, integrations, product workflows, drag-and-drop store building, and internal account management. My role was to bring structure to a fragmented product environment by translating research, market gaps, and business priorities into a scalable product direction, modular UX architecture, and production-ready design system.",
     contextPoints: [
-      { title: "The lab was lying", description: "Usability scores in the office were excellent. In the field, error rates tripled. The gap was environment, not interface logic." },
-      { title: "Motion and gloves broke touch targets", description: "Standard 44pt targets weren't enough for gloved taps on moving vehicles. Misfires cascaded into order errors." },
-      { title: "Fatigue, not features, was the issue", description: "By hour 6 of a shift, users needed fewer choices — not more guidance — and the interface didn't recognise that." },
+      { title: "Fragmented operational workflows", description: "Teams had to move across disconnected tools and manual processes to manage products, storefronts, schedules, integrations, and account operations." },
+      { title: "Complex admin experiences", description: "Existing admin workflows were functional but not intuitive enough for diverse users managing high-volume B2B operations." },
+      { title: "Limited product scalability", description: "The ecosystem needed a modular structure that could support multiple product areas without creating inconsistent experiences." },
+      { title: "High dependency on manual coordination", description: "Many operational tasks required repeated follow-ups, internal coordination, and platform workarounds." },
+      { title: "Inconsistent experience across modules", description: "Different parts of the ecosystem lacked a unified interaction model, making the overall product harder to learn, scale, and maintain." },
     ],
+    decisionCategories: ["Architecture", "Research & Alignment", "Automation", "Experience Design", "Scalable Design System"],
     keyDecisions: [
-      { title: "Environment as a first-class input", description: "Ambient light, device motion, and connectivity feed into a state machine that adjusts target size, contrast, and density in real time.", rationale: "Adaptation has to be automatic. Asking tired field workers to change settings defeats the point.", artefacts: ["Sensor state machine", "Adaptation rules"] },
-      { title: "Field Mode: three actions, nothing else", description: "A simplified mode surfaces only the top three actions based on time-of-day and prior usage.", rationale: "In harsh conditions, the interface's job is to let someone finish — not to show them everything they could do.", artefacts: ["Field Mode spec", "Shortlist logic"] },
-      { title: "Prototype in the real environment", description: "Usability testing moved to warehouses and moving vehicles, not conference rooms.", rationale: "If the lab couldn't produce the failure mode, the lab couldn't validate the fix.", artefacts: ["In-field protocol", "Test rigs"] },
-      { title: "Larger targets by default, not a setting", description: "Every primary action is sized for a gloved tap — the 'regular' mode never re-appears.", rationale: "Accessibility you can turn off is accessibility most users never find.", artefacts: ["Target size guide", "Regression tests"] },
-      { title: "Offline is the default state", description: "Every screen assumes the connection is gone; syncs are background and silent when it returns.", rationale: "Trucks go through tunnels. Warehouses have dead zones. Offline-first is the only honest mode.", artefacts: ["Offline cache plan", "Sync reconciler"] },
+      { title: "Established a Modular Ecosystem Architecture", description: "The platform needed to work as more than a set of individual tools. I helped structure the experience as a connected SaaS ecosystem where each product area had a clear purpose, while still feeling part of one unified operating system. This created a scalable foundation for admin workflows, storefront management, integrations, scheduling, store building, and internal account operations.", artefacts: ["Ecosystem Design", "Modular Architecture"], image: "/P3 - Key Decision 1.png" },
+      { title: "Defined Product Priorities Through Research, Strategy, and Collaboration", description: "The product direction was shaped through research into user needs, workflow gaps, competitive patterns, and business objectives. I translated these insights into product structures, user flows, and experience priorities that aligned business goals with operational realities, helping the team move from broad feature ideas to a clear product roadmap. The work also involved close collaboration with stakeholders through workshops, workflow mapping, strategic artifacts, and product discussions. These activities helped align teams around priorities, clarify requirements, and create a shared understanding of how different parts of the ecosystem worked together.", artefacts: ["User Research", "Product Strategy", "Stakeholder Alignment"], image: "/P3 - KD2.png" },
+      { title: "Simplified Operational Workflows Across the Platform", description: "A major focus was reducing complexity across admin experiences, scheduling workflows, integrations, and account operations. This included defining and shaping the integrations product as a dedicated area of the platform, giving users a centralized way to connect, manage, and monitor third-party services. The experience was designed to help users complete tasks faster, understand system states more clearly, and manage interconnected workflows without relying on manual coordination or workarounds.", artefacts: ["Admin UX", "In-built Integrations"], image: "/P3 - KD3.png" },
+      { title: "Empowered Teams Through Self-Service Storefront Management", description: "The drag-and-drop store builder gave business users greater control over storefront creation and management without heavy technical dependency. This increased flexibility while maintaining consistency with the broader ecosystem and operational standards.", artefacts: ["No-Code Control", "Storefront Management"], image: "/P3 - KD4.png" },
+      { title: "Created a Scalable Design System and Delivery Framework", description: "The design delivery focused on reusable UI patterns, consistent interaction models, and clear handoff documentation. This established a scalable foundation that improved development efficiency, reduced inconsistencies, and made future product expansion easier.", artefacts: ["Design System", "Developer Handoff"], image: "/P3 - KD5.png" },
     ],
     impactItems: [
-      { title: "45% better completion in low light", detail: "Field-tested across 4 warehouse locations" },
-      { title: "78% fewer accidental taps in motion", detail: "Measured with in-vehicle instrumentation" },
-      { title: "4.7 / 5 rating from field workers", detail: "Post-launch survey, n=312" },
-      { title: "30% growth in daily active usage", detail: "Within 60 days of rollout" },
+      { title: "Improved user experience and operational efficiency", detail: "The redesigned workflows simplified complex B2B operations, making key tasks easier to understand, manage, and complete while reducing manual effort, fragmented processes, and operational overhead." },
+      { title: "Stronger product consistency and delivery execution", detail: "Reusable patterns, unified design decisions, and a structured design system created a more consistent experience across the platform while reducing friction between product, design, and engineering teams." },
+      { title: "Enhanced scalability and market adaptability", detail: "The modular ecosystem provided a scalable foundation for growth, enabling the platform to support additional modules, customer segments, business models, and operational requirements over time." },
+      { title: "Clearer product strategy and faster execution", detail: "Research-driven product structures, UX frameworks, and reusable artifacts transformed a broad SaaS vision into a focused roadmap, helping teams move more efficiently from strategy to design and development." },
     ],
-    aiInProject: {
-      summary: "AI helped us see usage patterns that interviews alone would have missed, and accelerated the long tail of microcopy work.",
-      points: [
-        { area: "Field research synthesis", detail: "Claude + Otter processed 20+ field interviews overnight — themes surfaced in one working day, not two weeks." },
-        { area: "Scenario stress-testing", detail: "GPT-4 generated 40 edge-case usage scenarios — gloves, rain, 5% battery — that we walked designs through before prototyping." },
-        { area: "Environmental mood boards", detail: "Midjourney produced high-contrast UI direction for three lighting modes in an afternoon." },
-        { area: "Adaptive state microcopy", detail: "Claude drafted 60+ transition strings; humans picked the 30 that read well under pressure." },
-      ],
-    },
-    learnings: [
-      { title: "Context is a feature", detail: "Designing for the average user in the average environment is designing for no one. Environmental signals deserve the same treatment as user input." },
-      { title: "Field testing reshaped scope twice", detail: "Two features that tested well in the office failed in-vehicle — we cut them. The instinct to defend prior decisions is the enemy of good adaptation." },
-      { title: "Less is more under strain", detail: "Field Mode's 'three actions' rule felt reductive in review and indispensable in use. Cognitive load is a first-order constraint." },
-    ]
   },
   {
-    id: "quantum-collab",
-    title: "Async Collaboration Platform",
-    category: "Enterprise SaaS",
-    description: "A next-generation collaboration workspace that uses predictive AI to surface the right information at the right time — cutting context-switching and notification overload for globally distributed teams.",
-    image: "https://images.unsplash.com/photo-1688413709025-5f085266935a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMHRlY2hub2xvZ3klMjBwYXR0ZXJufGVufDF8fHx8MTc3MjAwOTE2NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    role: "UX Design Lead & Researcher",
-    timeline: "12 months (2024–2025)",
-    industry: "Future of Work / Enterprise",
-    clientSize: "Enterprise (500+ employees, 12 time zones)",
-    problem: "Remote teams across 12 time zones were drowning in fragmented communication — Slack threads with no resolution, emails with attachments that became outdated, and weekly syncs that existed to compensate for unclear async handoffs. People spent more time searching for context than doing the actual work.",
-    solution: "Designed a unified async workspace with an AI context layer that intelligently links related conversations, files, and decisions. Smart notifications respect focus hours and time zones. A 'catch-up digest' feature summarises overnight activity into a 3-minute brief, personalised by role and active projects.",
+    id: "case-study-4",
+    title: "No-Code Integration Platform for Business Operations",
+    category: "No-Code Workflows",
+    description: "Designing a simpler way for teams to connect systems, map data, and automate workflows without depending heavily on technical teams.",
+    image: "/P4 - Hero.png",
+    role: "Head of Product Design",
+    timeline: "6 months (2025)",
+    industry: "Enterprise SaaS / AI Tooling",
+    clientSize: "Enterprise (250+ employees)",
+    problem: "Business leaders needed to track AI model performance but lacked the technical context to interpret raw metrics. The existing dashboard was built for data engineers — it overwhelmed non-technical users and led to constant escalations to the data team for basic questions.",
+    solution: "Designed a progressive disclosure dashboard that adapts its complexity to the viewer's role. Executives see business-impact summaries; data teams get granular controls. Custom visualizations translate technical metrics into revenue and risk language, with contextual tooltips that teach rather than just label.",
     outcomes: [
-      "55% reduction in reported context-switching time (post-launch survey)",
-      "70% decrease in 'where is that file/decision?' Slack messages",
-      "Meeting frequency reduced by 40% — replaced with structured async handoffs",
-      "NPS score improved from 22 to 61 among power users in 3 months"
+      "85% of non-technical users correctly interpreted model performance in usability testing",
+      "60% decrease in data team support tickets within 8 weeks of launch",
+      "3x increase in weekly active usage among leadership team",
+      "Average time-to-decision reduced from 4 days to same-day"
     ],
-    technologies: ["GraphQL", "Electron", "React", "ML Recommendation Engine", "WebRTC"],
+    technologies: ["D3.js", "WebGL", "React", "Python / FastAPI", "WebSockets"],
     deliverables: [
-      "End-to-end product design (web + desktop)",
-      "AI notification logic UX specification",
-      "Catch-up digest feature prototype",
-      "Onboarding and empty-state designs",
-      "Design system with async-first component patterns",
-      "Research report: async work mental models across cultures"
+      "High-fidelity Figma prototype (desktop + tablet)",
+      "Role-based view specifications (Executive / Analyst / Engineer)",
+      "Custom data visualization component library",
+      "Onboarding flow design",
+      "UX research report with usability test findings"
     ],
     aiWorkflow: [
       {
-        phase: "Research Synthesis",
+        phase: "User Research",
         tool: "Claude + Dovetail AI",
-        impact: "Analysed 300+ survey responses and 25 interviews in 3 days — normally a 3-week effort"
+        impact: "Analyzed 15 stakeholder interviews and 6 months of support tickets in 4 hours"
       },
       {
-        phase: "Workflow Mapping",
-        tool: "GPT-4 + Miro AI",
-        impact: "Auto-clustered 180 sticky notes from workshops into themes in 20 minutes"
+        phase: "Information Architecture",
+        tool: "GPT-4 + FigJam AI",
+        impact: "Generated and evaluated 8 IA structures in 1 day vs. 1 week of workshops"
       },
       {
-        phase: "Feature Ideation",
+        phase: "Chart Design",
+        tool: "Midjourney + manual Figma work",
+        impact: "Produced 20 visualization concepts in a half-day for stakeholder review"
+      },
+      {
+        phase: "Copy & Tooltips",
         tool: "Claude",
-        impact: "Generated 50+ feature concepts aligned to job-to-be-done framework in 1 session"
-      },
-      {
-        phase: "Prototype Narrative",
-        tool: "Claude + Framer AI",
-        impact: "Wrote stakeholder demo script and in-prototype microcopy 4x faster than previous projects"
+        impact: "Wrote plain-language explanations for 40+ technical metrics in 2 hours"
       }
     ],
     processTimeline: [
       {
         phase: "Discovery",
-        duration: "Week 1–4",
-        description: "300-person survey, 25 in-depth interviews, 2 diary studies across 3 time zones"
+        duration: "Week 1–2",
+        description: "Shadowed 6 user sessions, reviewed support ticket patterns, mapped decision-making workflows"
       },
       {
         phase: "Define",
-        duration: "Week 5–6",
-        description: "Synthesised insights into 4 core problems, created opportunity statements, aligned stakeholders on scope"
+        duration: "Week 3",
+        description: "Defined 3 user personas, prioritised metrics by business impact, aligned with engineering on data availability"
       },
       {
         phase: "Design",
-        duration: "Week 7–18",
-        description: "3 design sprints, 4 prototype rounds, usability testing with 24 participants across 6 countries"
+        duration: "Week 4–9",
+        description: "Iterated on IA, built interactive prototype, ran 2 rounds of usability testing with 5 participants each"
       },
       {
         phase: "Deliver",
-        duration: "Week 19–20",
-        description: "Phased handoff across 3 engineering squads, design QA for beta release, post-launch monitoring plan"
+        duration: "Week 10–11",
+        description: "Final handoff with annotated specs, edge case documentation, and a live walkthrough with the engineering team"
       }
     ],
-    tagline: "Async work, without the context tax.",
-    context: "A 500-person enterprise across 12 time zones had grown faster than its communication norms. Slack threads went unresolved, email attachments went stale, and weekly sync meetings existed to patch over unclear async handoffs. The team was spending more time finding context than producing work.",
+    tagline: "Designing a simpler way for teams to connect systems, map data, and automate workflows without depending heavily on technical teams.",
+    heroImage: "/P4 - Hero.png",
+    contextImage: "/P4 - Context and Problems.png",
+    context: "Business teams were increasingly dependent on connected tools, but the process of integrating systems, transforming data, and maintaining workflows was still too technical, fragmented, and difficult to manage without engineering support. I worked on the UX direction for a no-code integration experience that helped users configure data flows, map fields, build workflow logic, and monitor integration performance through a more accessible product interface. The goal was to make complex integration tasks feel structured, understandable, and usable for non-technical teams while still supporting the flexibility required by more advanced operational workflows.",
     contextPoints: [
-      { title: "Fragmented by channel", description: "Every decision lived somewhere different — Slack, Notion, email, call recordings. Finding 'the latest' meant asking three people." },
-      { title: "Meetings compensated for bad async", description: "30+ weekly syncs existed to re-establish context that async handoffs had failed to carry." },
-      { title: "Notification overload, signal drought", description: "The average user received 90+ notifications per day and reported missing the ones that actually mattered." },
+      { title: "Integration setup was too technical", description: "Users needed to understand systems, fields, mappings, conditions, and dependencies before they could confidently build or modify workflows." },
+      { title: "Data mapping was difficult to understand", description: "Users struggled to see how information moved between systems, where fields transformed, and what would happen when data changed." },
+      { title: "Business users depended heavily on support teams", description: "Even simple changes often required technical help, creating delays, repeated support requests, and slower adoption." },
+      { title: "Workflow visibility was limited", description: "Users could create or configure flows, but had limited clarity into what was running, what failed, and what needed attention." },
+      { title: "The product needed to scale across different use cases", description: "The experience had to support multiple integration needs without becoming too rigid, too technical, or too overwhelming for everyday users." },
     ],
+    decisionCategories: ["Guided Workflow Design", "Visual Data Mapping", "Modular Architecture", "Design Validation", "Lifecycle & Visibility"],
     keyDecisions: [
-      { title: "An AI context layer, not a new channel", description: "The product links related messages, files, and decisions automatically rather than adding another inbox.", rationale: "The problem wasn't too few tools — it was that tools didn't know about each other.", artefacts: ["Context graph", "Integration map"] },
-      { title: "Catch-up digest as the primary surface", description: "A role-aware three-minute overnight digest became the morning home screen for distributed teams.", rationale: "People returning to work don't want a firehose. They want the 10% of activity that needs them specifically.", artefacts: ["Digest template", "Relevance model"] },
-      { title: "Respect focus, explicitly", description: "Notification logic reads focus hours and time zones before it fires.", rationale: "Interrupting someone in their deep-work block at 2am local time is a bug, not a feature.", artefacts: ["Focus policy", "Quiet-hours rules"] },
-      { title: "Decisions are first-class objects", description: "Threads can be promoted to 'decisions' with owner, status, and linked context — searchable long after the conversation fades.", rationale: "Messages disappear. Decisions shouldn't have to be re-asked every quarter.", artefacts: ["Decision schema", "Thread promotion UX"] },
-      { title: "Async rituals replace standing meetings", description: "Structured templates for updates, handoffs, and check-ins let teams retire 40% of their recurring syncs.", rationale: "Meetings are a bandaid for async that doesn't carry context. Fix the async, lose the bandaid.", artefacts: ["Ritual templates", "Cadence guide"] },
+      { title: "Turning complex integrations into a structured no-code experience", description: "Integrations were redesigned as guided workflows with clear steps for setup, testing, and monitoring. Technical complexity was progressively revealed, allowing non-technical users to complete tasks without feeling overwhelmed. The result was a more approachable experience that reduced setup friction and improved user confidence.", artefacts: ["Guided setup", "Workflow clarity", "Non-technical UX"], image: "/P4 - KD1.png" },
+      { title: "Making integrations easier to build and understand", description: "A drag-and-drop workflow builder helped users create integrations visually, while a simplified mapping experience made data relationships easier to understand. Together, these tools improved clarity, reduced errors, and helped users identify issues before workflows went live.", artefacts: ["Visual builder", "Data mapping", "Error prevention"], image: "/P4 - KD2 Updated.png" },
+      { title: "Creating a scalable foundation for multiple integration scenarios", description: "A modular system of connectors, triggers, actions, and validations created a consistent framework for building integrations across different use cases. This approach improved scalability while keeping the experience cohesive as the platform expanded.", artefacts: ["Modular architecture", "Scalable UX"], image: "/P4 - KD3.png" },
+      { title: "Testing concepts before implementation", description: "Concepts were refined through collaborative workshops, prototyping, and user testing to validate workflow logic, terminology, and usability. These iterations helped uncover confusion early and informed improvements before development.", artefacts: ["Iterative testing", "Design validation"], image: "/P4 - KD4.png" },
+      { title: "Supporting users beyond initial setup", description: "The platform was designed to support the entire integration lifecycle, from setup and testing to monitoring and maintenance. Operational dashboards provided visibility into workflow health, failures, and activity, helping users resolve issues faster and reduce reliance on support teams.", artefacts: ["Monitoring UX", "Lifecycle UX", "Support reduction"], image: "/P4 - KD5.png" },
     ],
     impactItems: [
-      { title: "55% less reported context-switching", detail: "From the post-launch user survey" },
-      { title: "70% fewer 'where is that?' messages", detail: "Measured via keyword tracking in Slack" },
-      { title: "40% fewer meetings", detail: "Replaced with structured async handoffs" },
-      { title: "+39 NPS improvement", detail: "From 22 to 61 in 3 months among power users" },
+      { title: "Faster onboarding and broader adoption", detail: "The guided workflow structure and no-code builder made the platform easier to understand and use, reducing the learning curve for first-time users while increasing confidence and adoption among business teams." },
+      { title: "Reduced support dependency and operational friction", detail: "Clearer configuration patterns, validation states, and error visibility helped users resolve common setup issues independently, reducing reliance on support teams and enabling faster workflow management." },
+      { title: "Improved operational visibility and efficiency", detail: "Teams could connect tools, automate data movement, and maintain workflows more effectively, while dashboards provided clear visibility into workflow health, failures, activity, and performance." },
+      { title: "Scalable foundation for future growth", detail: "The modular product structure created a flexible framework for supporting new connectors, workflows, and integration scenarios, helping the platform scale as business needs evolved." },
     ],
-    aiInProject: {
-      summary: "AI accelerated qualitative research and workshop synthesis — the two phases that historically drown async projects in process before design begins.",
-      points: [
-        { area: "Survey + interview synthesis", detail: "Claude clustered 300 open-ended survey responses and 25 interviews in 3 days — a job that normally takes 3 weeks." },
-        { area: "Workshop clustering", detail: "GPT-4 + Miro auto-grouped 180 sticky notes into themes in 20 minutes, freeing workshop time for discussion rather than sorting." },
-        { area: "Feature ideation", detail: "Claude generated 50+ concepts mapped to job-to-be-done statements in one session — we kept 12." },
-        { area: "Demo narrative", detail: "Claude drafted the stakeholder-demo script and in-prototype microcopy at 4x our historical pace." },
-      ],
-    },
-    learnings: [
-      { title: "Notifications are a product, not a setting", detail: "Treating notification logic as a first-class design surface — not an afterthought — changed the adoption story more than any feature." },
-      { title: "Culture is downstream of defaults", detail: "Switching the default landing surface from the inbox to the digest shifted team behaviour within two weeks. Defaults matter more than docs." },
-      { title: "Async is a capability, not a style", detail: "Teams didn't need more async — they needed better async. The difference is product infrastructure, not etiquette guidelines." },
-    ]
+  },
+  {
+    id: "case-study-5",
+    title: "Tailored Storefront Builder for Diverse Business Needs",
+    category: "Storefront Builder",
+    description: "Creating a flexible storefront builder that helped businesses customize online experiences, launch faster, and manage their websites with less external dependency.",
+    image: "https://images.unsplash.com/photo-1752253604157-65fb42c30816?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsJTIwZnV0dXJpc3RpYyUyMGludGVyZmFjZSUyMGRlc2lnbnxlbnwxfHx8fDE3NzIxMDUxNjF8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    role: "Head of Product Design",
+    timeline: "6 months (2025)",
+    industry: "Enterprise SaaS / AI Tooling",
+    clientSize: "Enterprise (250+ employees)",
+    problem: "Business leaders needed to track AI model performance but lacked the technical context to interpret raw metrics. The existing dashboard was built for data engineers — it overwhelmed non-technical users and led to constant escalations to the data team for basic questions.",
+    solution: "Designed a progressive disclosure dashboard that adapts its complexity to the viewer's role. Executives see business-impact summaries; data teams get granular controls. Custom visualizations translate technical metrics into revenue and risk language, with contextual tooltips that teach rather than just label.",
+    outcomes: [
+      "85% of non-technical users correctly interpreted model performance in usability testing",
+      "60% decrease in data team support tickets within 8 weeks of launch",
+      "3x increase in weekly active usage among leadership team",
+      "Average time-to-decision reduced from 4 days to same-day"
+    ],
+    technologies: ["D3.js", "WebGL", "React", "Python / FastAPI", "WebSockets"],
+    deliverables: [
+      "High-fidelity Figma prototype (desktop + tablet)",
+      "Role-based view specifications (Executive / Analyst / Engineer)",
+      "Custom data visualization component library",
+      "Onboarding flow design",
+      "UX research report with usability test findings"
+    ],
+    aiWorkflow: [
+      {
+        phase: "User Research",
+        tool: "Claude + Dovetail AI",
+        impact: "Analyzed 15 stakeholder interviews and 6 months of support tickets in 4 hours"
+      },
+      {
+        phase: "Information Architecture",
+        tool: "GPT-4 + FigJam AI",
+        impact: "Generated and evaluated 8 IA structures in 1 day vs. 1 week of workshops"
+      },
+      {
+        phase: "Chart Design",
+        tool: "Midjourney + manual Figma work",
+        impact: "Produced 20 visualization concepts in a half-day for stakeholder review"
+      },
+      {
+        phase: "Copy & Tooltips",
+        tool: "Claude",
+        impact: "Wrote plain-language explanations for 40+ technical metrics in 2 hours"
+      }
+    ],
+    processTimeline: [
+      {
+        phase: "Discovery",
+        duration: "Week 1–2",
+        description: "Shadowed 6 user sessions, reviewed support ticket patterns, mapped decision-making workflows"
+      },
+      {
+        phase: "Define",
+        duration: "Week 3",
+        description: "Defined 3 user personas, prioritised metrics by business impact, aligned with engineering on data availability"
+      },
+      {
+        phase: "Design",
+        duration: "Week 4–9",
+        description: "Iterated on IA, built interactive prototype, ran 2 rounds of usability testing with 5 participants each"
+      },
+      {
+        phase: "Deliver",
+        duration: "Week 10–11",
+        description: "Final handoff with annotated specs, edge case documentation, and a live walkthrough with the engineering team"
+      }
+    ],
+    tagline: "Creating a flexible storefront builder that helped businesses customize online experiences, launch faster, and manage their websites with less external dependency.",
+    heroImage: "/P5- Hero.png",
+    contextImage: "/P5 - Context + Problems.png",
+    context: "Businesses using the platform needed more control over how their online storefronts looked, worked, and scaled. The existing setup made customization possible, but it often required technical effort, external support, or repeated coordination with implementation teams. The opportunity was to design a storefront builder that could support different business models, product catalogs, content needs, and brand requirements without forcing every customer into the same rigid website structure. I led the design of a storefront builder that made website creation more modular, accessible, and scalable — helping businesses configure layouts, manage content, customize themes, and launch storefronts faster with greater control.",
+    contextPoints: [
+      { title: "Limited customization for different business needs", description: "Businesses needed more flexibility to shape storefronts around their industry, catalog structure, brand, and customer experience." },
+      { title: "High dependency on external support", description: "Storefront setup and updates often required help from implementation or technical teams, slowing down changes." },
+      { title: "Longer time to launch", description: "Without a more structured builder experience, creating and configuring storefronts took more time than expected." },
+      { title: "Difficulty scaling storefront variations", description: "As business requirements became more specific, the platform needed a more repeatable way to support different storefront experiences." },
+    ],
+    decisionCategories: ["Product Architecture", "Customization & Editing", "Templates & Accelerators", "Brand & Experience Control", "Quality & Scalability"],
+    keyDecisions: [
+      { title: "Making storefront creation more modular and scalable", description: "Storefronts were built around reusable modules, layout sections, and configurable components instead of fixed templates. This gave businesses the flexibility to create tailored experiences without requiring custom design or development for every use case. The modular foundation also made it easier to support business-specific functionality through configurable content, product, and interaction components.", artefacts: ["Modular System", "Scalable Setup"], image: "/P5 - KD1.png" },
+      { title: "Giving businesses more control without making the builder complex", description: "The builder simplified customization across layouts, content, styling, and page structure, allowing users to make changes confidently without technical expertise. A drag-and-drop editing experience made storefront creation more intuitive and reduced reliance on implementation teams.", artefacts: ["Self-Serve Editing", "Visual Builder"], image: "/P5 - KD2.png" },
+      { title: "Designing a template library to speed up launch", description: "A template library provided ready-made storefront structures, helping businesses get started faster instead of building from scratch. Combined with reusable components and guided customization, templates accelerated launch while preserving flexibility.", artefacts: ["Template Library", "Faster Launch"], image: "/P5 - KD3.png" },
+      { title: "Enabling customization while maintaining a strong and consistent brand identity", description: "Businesses could customize colors, typography, and visual styling while maintaining a consistent and usable storefront experience. Responsive tools helped teams preview and optimize layouts across desktop and mobile devices.", artefacts: ["Theme Customization", "Cross-Device Experience"], image: "/P5 - KD4.png" },
+      { title: "Building storefronts that were flexible, usable, and production-ready", description: "Accessibility and SEO considerations were built into the experience, helping businesses create storefronts that were easier to use, discover, and launch. These guardrails balanced customization with platform standards and long-term scalability.", artefacts: ["Accessibility Basics", "SEO Readiness"], image: "/P5 - KD5.png" },
+    ],
+    impactItems: [
+      { title: "Faster launches with greater independence", detail: "Businesses launched storefronts faster using templates, reusable components, and guided customization. Non-technical users could manage updates themselves, reducing reliance on implementation and development teams." },
+      { title: "Scalable storefront creation", detail: "The modular architecture supported different industries, catalog structures, and business models without requiring custom storefront builds, making creation more repeatable and efficient." },
+      { title: "Better storefronts, stronger engagement", detail: "Businesses created more polished, brand-aligned storefronts that showcased products and content more effectively, leading to stronger customer engagement." },
+      { title: "Greater flexibility and efficiency", detail: "Teams could update content, test layouts, and manage storefronts with less overhead. The builder transformed a fixed storefront setup into a scalable website creation platform that evolved with customer needs." },
+    ],
+    reflection: "This project turned storefront creation into a more flexible, self-serve, and scalable experience. The work helped businesses move faster without losing control over quality. By combining templates, modular components, drag-and-drop editing, responsive tools, and theme customization, the storefront builder gave customers a clearer way to create tailored e-commerce experiences without depending on repeated technical support.",
   }
 ];
