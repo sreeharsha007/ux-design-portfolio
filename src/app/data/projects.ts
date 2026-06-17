@@ -95,6 +95,7 @@ export const projects: Project[] = [
     category: "AI Security Platform",
     description: "An AI-native security platform that connects vulnerabilities across code, teams, and ownership — helping organisations see not just what's broken, but who owns it, why it matters, and how to act on it.",
     image: "https://images.unsplash.com/photo-1647356191320-d7a1f80ca777?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxBSSUyMG5ldXJhbCUyMG5ldHdvcmslMjB2aXN1YWxpemF0aW9ufGVufDF8fHx8MTc3MjA2OTExMnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    heroImage: "/Featured Project Hero Image.png",
     role: "Lead UX Designer",
     timeline: "8 months (2025)",
     industry: "Enterprise SaaS / Cybersecurity",

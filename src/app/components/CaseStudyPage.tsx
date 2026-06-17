@@ -320,7 +320,7 @@ export default function CaseStudyPage() {
             </div>
 
             {/* Metadata */}
-            <motion.div {...fadeUp(0.05)} className="flex flex-wrap items-center gap-5 mb-7 text-[12px]">
+            <motion.div {...fadeUp(0.05)} className="flex flex-wrap justify-center items-center gap-5 mb-7 text-[12px]">
               <HighlightMark delay={0.2}>{category}</HighlightMark>
               <span style={{ color: "#e7e5e4" }} className="hidden sm:inline text-[10px]">·</span>
               <HighlightMark delay={0.4}>{role}</HighlightMark>
@@ -333,7 +333,7 @@ export default function CaseStudyPage() {
             {/* Title */}
             <motion.h1
               {...fadeUp(0.1)}
-              className="text-[32px] sm:text-[48px] lg:text-[58px] font-bold leading-[1.1] tracking-[-0.025em] text-stone-900 max-w-[800px] mb-6"
+              className="text-[32px] sm:text-[48px] lg:text-[58px] font-bold leading-[1.1] tracking-[-0.025em] text-stone-900 w-full mb-6 text-center"
               style={{ fontFamily: "var(--font-display)" }}
             >
               {title}
@@ -343,7 +343,7 @@ export default function CaseStudyPage() {
             {tagline && (
               <motion.p
                 {...fadeUp(0.18)}
-                className="text-[17px] sm:text-[19px] leading-relaxed max-w-[580px] mb-10"
+                className="text-[17px] sm:text-[19px] leading-relaxed w-full mb-10 text-center"
                 style={{ color: "#78716c" }}
               >
                 {tagline}
@@ -1041,6 +1041,36 @@ export default function CaseStudyPage() {
         {project?.testimonial && (
           <CaseStudyTestimonial {...project.testimonial} />
         )}
+
+        {/* ── More Work ─────────────────────────────────────────────────── */}
+        <section className="py-16" style={{ background: "#faf8f7" }}>
+          <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#c4651a] mb-8">More Work</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {projects
+                .filter((p) => p.id !== project.id)
+                .map((p) => (
+                  <Link
+                    key={p.id}
+                    to={`/case-study/${p.id}`}
+                    className="group flex flex-col gap-3"
+                  >
+                    <div className="rounded-xl overflow-hidden bg-[#ede9e5] aspect-[4/3]">
+                      <img
+                        src={p.heroImage ?? p.image}
+                        alt={p.title}
+                        className="w-full h-full object-contain scale-90 transition-transform duration-500 group-hover:scale-95"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold tracking-widest uppercase text-[#c4651a] mb-1">{p.category}</p>
+                      <p className="text-sm font-medium text-[#1a1a1a] leading-snug group-hover:underline underline-offset-2 decoration-[#c4651a]/40 line-clamp-2">{p.title}</p>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+          </div>
+        </section>
 
         <ContactSection />
 
