@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router";
 import Navigation from "./Navigation";
 import ScrollToTop from "./ScrollToTop";
+import ScrollToTopButton from "./ScrollToTopButton";
 import CustomCursor from "./CustomCursor";
 import { ThemeProvider } from "../context/ThemeContext";
 
@@ -17,6 +18,7 @@ export default function Root() {
     <ThemeProvider>
       <div className="min-h-screen bg-surface text-on-surface transition-colors duration-300">
         <ScrollToTop />
+        <ScrollToTopButton />
         <CursorWrapper />
         <Navigation />
         <Outlet />
