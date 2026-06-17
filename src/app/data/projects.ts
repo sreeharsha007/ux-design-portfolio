@@ -596,7 +596,7 @@ export const projects: Project[] = [
     ],
     tagline: "Creating a flexible storefront builder that helped businesses customize online experiences, launch faster, and manage their websites with less external dependency.",
     heroImage: "/P5- Hero.png",
-    contextImage: "/P5 - Context + Problems.png",
+    contextImage: "/P5 - Context and Problems.png",
     context: "Businesses using the platform needed more control over how their online storefronts looked, worked, and scaled. The existing setup made customization possible, but it often required technical effort, external support, or repeated coordination with implementation teams. The opportunity was to design a storefront builder that could support different business models, product catalogs, content needs, and brand requirements without forcing every customer into the same rigid website structure. I led the design of a storefront builder that made website creation more modular, accessible, and scalable — helping businesses configure layouts, manage content, customize themes, and launch storefronts faster with greater control.",
     contextPoints: [
       { title: "Limited customization for different business needs", description: "Businesses needed more flexibility to shape storefronts around their industry, catalog structure, brand, and customer experience." },
