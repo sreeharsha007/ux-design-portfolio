@@ -1,0 +1,34 @@
+INTRO VIDEO SCRIPT — for Google Gemini (Veo) — 1 MINUTE VERSION
+Format: 6 shots × 10 seconds = 1:00 total
+Each shot has: VISUAL (what to show on screen / prompt for Gemini) + VOICEOVER (what's said during that shot)
+
+──────────────────────────────────────────
+SHOT 1 (0:00–0:10) — Hook / Who I am
+VISUAL: Slow zoom into the portfolio hero section — "Design that moves products forward."
+VO: "Hi, I'm Harsha — a UX designer helping growth-stage B2B teams ship better products, faster."
+
+SHOT 2 (0:10–0:20) — What makes me different
+VISUAL: Highlight the "Design Philosophy" cards — "System before screens," "Outcomes over output," "AI-augmented, human-led."
+VO: "What sets me apart? I start with systems, not screens — every decision tied to real outcomes, accelerated by AI but always led by human judgment."
+
+SHOT 3 (0:20–0:30) — Process
+VISUAL: Show the "AI-Native Process" section — Discover, Frame, Design, Test, Deliver cards animating in sequence.
+VO: "My process is simple: Discover, Frame, Design, Test, and Deliver — a structured five-phase flow accelerated by AI at every stage."
+
+SHOT 4 (0:30–0:40) — Project showcase montage
+VISUAL: Quick montage cutting between the AI Security Platform, Pipeline Operations Platform, and Context-Aware Mobile App case study covers.
+VO: "From AI-native security platforms to industrial operations tools to context-aware mobile apps — different industries, same approach: real context, real systems, real impact."
+
+SHOT 5 (0:40–0:50) — Social proof
+VISUAL: Animate in a testimonial quote — "Delivered a full design system in 8 weeks that our previous agency quoted 6 months for."
+VO: "Don't just take my word for it — teams I've worked with call it speed without sacrificing depth."
+
+SHOT 6 (0:50–1:00) — Call to action / Closing
+VISUAL: Show the project grid with "View Case Studies" button, then return to hero with name/logo, fade out.
+VO: "Explore the full case studies on my portfolio — and if you're ready to talk, let's design something that moves your product forward."
+
+──────────────────────────────────────────
+NOTES FOR GEMINI GENERATION
+- Voiceover lines are tighter (~22-26 words) to fit 10 seconds at a natural pace.
+- This version trades depth for breadth — it's a teaser/hook to drive viewers into the full portfolio, rather than a full walkthrough.
+- If you want, the 3-minute version remains available as the "deep dive" version for a different placement (e.g., embedded on the case study page itself).

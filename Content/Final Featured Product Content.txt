@@ -1,0 +1,63 @@
+Project Title: AI-Native Security Intelligence Platform
+Project Description: 
+Finding vulnerabilities was possible. Understanding them in context was not.
+
+I worked on an AI-native security platform that connected vulnerabilities across code, teams, ownership, and business context.
+
+The opportunity was to move beyond surfacing security signals — and help organizations understand who owns the risk, why it matters, and how teams should act on it.
+
+Context
+The problem was rooted in how modern organizations operate.
+
+Resources, ownership, costs, and risks were often spread across teams, making it difficult to trace accountability or prioritize what mattered.
+
+As organizations became more layered, users needed a faster way to access context, investigate issues, and align the right teams around action.
+
+Challenge
+The problem was not finding security signals. It was understanding them in context.
+Three things made that difficult:
+* Risk context was fragmented. Technical findings were visible, but their relationship to ownership, organizational structure, and impact was hard to trace. 
+* Accessing insights required too much effort. Critical information was buried inside deep hierarchies, slowing down high-stakes workflows. 
+* RCA was collaborative, but the workflow was not. Investigations involved multiple teams, yet the supporting experience was disjointed. 
+At the same time, AI introduced a new opportunity to surface intelligence more naturally, but the interaction patterns were still evolving. That made trust, clarity, and feedback essential.
+
+
+What Shaped the Product
+
+1 Making organizational complexity more intelligible
+I introduced a semantic layer during onboarding and mapping to better structure organizational information for both users and AI. This created a stronger basis for linking vulnerabilities to ownership, accountability, cost visibility, and business context.
+
+2 Reducing dependence on drill-down navigation
+To reduce the effort needed to retrieve insights, the experience introduced both global and contextual AI chat. This gave users a faster way to access answers and updates without removing the ability to drill deeper when needed.
+
+3 Reframing RCA around collaboration
+A key gap emerged in how root cause analysis was being performed. Since RCA is typically cross-functional, I helped shape an AI-powered canvas that better supported investigation in context, team collaboration, and shareable outputs for quicker resolution.
+
+4 Grounding AI interactions in usability principles
+Because AI UI patterns were still maturing, I used HCI principles to shape interactions that felt more understandable, responsive, and trustworthy in a high-stakes environment.
+
+5 Building a scalable design system foundation
+I established a scalable design system direction to support consistency, reuse, and faster product evolution as the platform grew.
+
+
+Impact and outcomes
+What changed once the design shipped
+
+1 MVP became clearer — Product framing and prioritization helped define a more credible direction for funding and future growth.
+
+2 Organizational context became more intelligent — The semantic layer helped connect teams, resources, ownership, and vulnerabilities in a more meaningful way.
+
+3 Investigation and reporting became more accessible — AI chat and collaborative workflows made it easier to find answers, investigate issues, and share outcomes.
+
+4 Delivery became more scalable — A stronger design system and cleaner UI handoff reduced friction between design and implementation.
+
+Designing for AI
+One of the most important parts of this project was designing in a space where AI interaction patterns were still taking shape.
+Rather than treating AI as a layer on top of the interface, I approached it as part of the workflow itself. That required careful thinking around trust, system feedback, usability, and user control.
+This project reinforced that in AI-led experiences, capability alone is not enough. Users also need clarity, orientation, and confidence in how the system is helping them.
+ 
+
+Reflection
+This project reinforced how important it is to design AI experiences around clarity, feedback, and control, especially in complex and high-stakes environments.
+It also highlighted a broader learning: when designing emerging AI products, the challenge is not only shaping the intelligence itself, but shaping the interaction patterns that help people trust and use that intelligence effectively.
+

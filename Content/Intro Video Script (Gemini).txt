@@ -1,0 +1,82 @@
+INTRO VIDEO SCRIPT — for Google Gemini (Veo)
+Format: 18 shots × 10 seconds = 3:00 total
+Each shot has: VISUAL (what to show on screen / prompt for Gemini) + VOICEOVER (what's said during that shot)
+
+──────────────────────────────────────────
+SHOT 1 (0:00–0:10) — Hook / Who I am
+VISUAL: Slow zoom into the portfolio hero section — "Design that moves products forward."
+VO: "Hi, I'm Harsha — a UX designer who helps growth-stage B2B teams ship better products, faster."
+
+SHOT 2 (0:10–0:20) — Credentials
+VISUAL: Pan across the hero tags: "7+ years," "Series A–C," "AI-native workflow," "4-week avg delivery."
+VO: "Over the past seven-plus years, I've worked with Series A to C teams — turning complex problems into products people actually want to use."
+
+SHOT 3 (0:20–0:30) — What makes me different (1)
+VISUAL: Highlight the "Design Philosophy" section — "System before screens."
+VO: "What sets me apart? I don't start with screens. I start with systems — information architecture and components first, so everything that follows scales."
+
+SHOT 4 (0:30–0:40) — What makes me different (2)
+VISUAL: Highlight "Outcomes over output" and "AI-augmented, human-led" cards.
+VO: "Every decision is tied to real outcomes — user behavior and business metrics, not just aesthetics. And I use AI to accelerate the work, while keeping human judgment in the driver's seat."
+
+SHOT 5 (0:40–0:50) — Constraints as fuel
+VISUAL: Highlight "Constraints as creative fuel" card with subtle motion.
+VO: "I see constraints — technical limits, accessibility, stakeholder needs — not as roadblocks, but as the rails that sharpen great design."
+
+SHOT 6 (0:50–1:00) — Process intro
+VISUAL: Transition into the "AI-Native Process — From problem to shipped product" section.
+VO: "So how do I work? I follow a structured five-phase process, accelerated by AI at every single stage."
+
+SHOT 7 (1:00–1:10) — Process: Discover & Frame
+VISUAL: Show "01 Discover" and "02 Frame" cards animating in.
+VO: "It starts with Discover — synthesizing research and mapping the problem — then Frame, where I align everyone on scope and success metrics before design even begins."
+
+SHOT 8 (1:10–1:20) — Process: Design, Test, Deliver
+VISUAL: Show "03 Design," "04 Test," and "05 Deliver" cards in sequence.
+VO: "From there: Design through rapid iteration, Test with real users, and Deliver pixel-perfect handoffs that engineering teams genuinely trust."
+
+SHOT 9 (1:20–1:30) — Project type 1: AI Security Platform
+VISUAL: Cut to the "AI-Native Security Intelligence Platform" case study card/cover image.
+VO: "Take this AI-native security platform — I helped connect vulnerabilities across code, teams, and ownership, so organizations could see not just what's broken, but who owns it and how to fix it."
+
+SHOT 10 (1:30–1:40) — Project type 2: Pipeline Operations
+VISUAL: Cut to the "AI-Assisted Pipeline Operations Platform" case study visuals (canvas builder, monitoring views).
+VO: "Or this industrial pipeline operations platform — where I turned complex monitoring and diagnostics into a visual, actionable experience, without losing the rigor those environments demand."
+
+SHOT 11 (1:40–1:50) — Project type 3: Mobile App
+VISUAL: Cut to the "Context-Aware Mobile App" case study — adaptive mobile UI frames.
+VO: "And this context-aware mobile app — designed to adapt to real-world conditions that lab testing simply misses, cutting field error rates dramatically."
+
+SHOT 12 (1:50–2:00) — The common thread
+VISUAL: Split-screen or montage of all three project covers side by side.
+VO: "Different industries, different problems — but the same approach: understand the real context, design the system, and prove it works."
+
+SHOT 13 (2:00–2:10) — Social proof
+VISUAL: Animate in a testimonial quote — e.g., "Delivered a full design system in 8 weeks that our previous agency quoted 6 months for."
+VO: "Don't just take my word for it — here's what the teams I've worked with have to say."
+
+SHOT 14 (2:10–2:20) — Second testimonial
+VISUAL: Animate in a second quote — "Speed without sacrificing depth... usability-tested, dev-ready prototype in 3 weeks."
+VO: "Speed without sacrificing depth — that's the balance I aim to bring to every single engagement."
+
+SHOT 15 (2:20–2:30) — Invitation to explore
+VISUAL: Show the full project grid / "View Case Studies" button on the homepage.
+VO: "If any of this sounds like the kind of thinking your team needs, I'd love for you to explore the full case studies on my portfolio."
+
+SHOT 16 (2:30–2:40) — Walkthrough teaser
+VISUAL: Quick scroll-through montage of case study detail pages — challenge, decisions, impact sections.
+VO: "Each one walks you through the real challenge, the key decisions I made, and the measurable impact those decisions had."
+
+SHOT 17 (2:40–2:50) — Call to connect
+VISUAL: Highlight the Contact section / "Let's talk" CTA with email or contact form.
+VO: "And if you're ready to talk about your product, I'm just one click away — let's start the conversation."
+
+SHOT 18 (2:50–3:00) — Closing
+VISUAL: Return to the hero — "Design that moves products forward." — logo/name on screen, fade out.
+VO: "I'm Harsha. Let's design something that moves your product forward."
+
+──────────────────────────────────────────
+NOTES FOR GEMINI GENERATION
+- Keep visual descriptions specific to actual portfolio screens/sections so Gemini grounds the video in real footage/screenshots where possible.
+- Voiceover lines are timed to fit comfortably within 10 seconds at a natural speaking pace (~22-28 words per shot).
+- Total runtime: 3:00 exactly across 18 shots.
