@@ -127,8 +127,7 @@ const FRACTURES = [
 
 // ─ Highlight ridges — bright edges facing the light
 const HIGHLIGHTS = [
-  "M 398 14 L 410 22 L 405 32 L 418 40",           // top tip edge
-  "L 410 48 L 422 56 L 415 66 L 430 74",
+  "M 398 14 L 410 22 L 405 32 L 418 40 L 410 48 L 422 56 L 415 66 L 430 74", // top tip edge
   "M 454 162 L 445 176",                            // waterline edge right
   "M 348 176 L 358 164",                            // waterline edge left
 ];
